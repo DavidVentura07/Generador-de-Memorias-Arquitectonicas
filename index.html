@@ -1,0 +1,1203 @@
+<style>
+  :root{
+    --ink:#0F1A24;
+    --ink-2:#33475B;
+    --ink-3:#6B8299;
+    --rule:#C7D2DC;
+    --rule-2:#E3EAF0;
+    --paper:#FFFFFF;
+    --paper-2:#F3F6F8;
+    --azul:#1D4E89;
+    --azul-soft:#E7EEF6;
+    --verde:#1E7A46;
+    --ambar:#A96A00;
+    --rojo:#B3261E;
+    --rojo-soft:#FBEAE8;
+    --ambar-soft:#FBF2E3;
+    --verde-soft:#E8F3EC;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  .mdapp{font-family:var(--sans);color:var(--ink);background:var(--paper);font-size:14px;line-height:1.5;}
+  .mdapp button{font-family:inherit}
+
+  /* ---- encabezado ---- */
+  .hd{border-bottom:2px solid var(--ink);padding:0 0 14px;margin-bottom:0}
+  .hd h1{font-size:17px;font-weight:700;letter-spacing:-.01em;margin:0 0 3px}
+  .hd p{margin:0;color:var(--ink-3);font-size:12px}
+  .hd-row{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+  .proj-chip{font-family:var(--mono);font-size:11px;background:var(--azul-soft);color:var(--azul);
+    padding:5px 10px;border:1px solid var(--rule);white-space:nowrap}
+
+  /* ---- estructura ---- */
+  .shell{display:grid;grid-template-columns:198px 1fr;gap:0;min-height:520px}
+  .rail{border-right:1px solid var(--rule);padding:14px 12px 40px 0}
+  .rail button{display:flex;gap:8px;align-items:baseline;width:100%;text-align:left;background:none;
+    border:0;padding:6px 8px;cursor:pointer;color:var(--ink-2);font-size:12.5px;border-left:2px solid transparent}
+  .rail button:hover{background:var(--paper-2)}
+  .rail button.on{color:var(--azul);border-left-color:var(--azul);background:var(--azul-soft);font-weight:600}
+  .rail .cod{font-family:var(--mono);font-size:10px;color:var(--ink-3);min-width:20px}
+  .rail button.on .cod{color:var(--azul)}
+  .rail .grp{font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);
+    padding:14px 8px 4px;font-weight:600}
+  .pane{padding:18px 0 18px 22px;min-width:0}
+  .pane h2{font-size:15px;margin:0 0 2px;font-weight:700}
+  .pane .sub{color:var(--ink-3);font-size:12px;margin:0 0 16px}
+
+  /* ---- cota: firma visual ---- */
+  .cota{display:flex;align-items:center;gap:7px;margin:22px 0 10px}
+  .cota span{font-family:var(--mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;
+    color:var(--ink-2);white-space:nowrap;font-weight:600}
+  .cota i{flex:1;height:1px;background:var(--rule);position:relative}
+  .cota i::before,.cota i::after{content:"";position:absolute;top:-3px;width:1px;height:7px;background:var(--rule)}
+  .cota i::before{left:0}.cota i::after{right:0}
+
+  /* ---- campos ---- */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:11px 14px}
+  .f label{display:block;font-size:11.5px;color:var(--ink-2);margin-bottom:3px;font-weight:500}
+  .f input,.f select,.f textarea{width:100%;padding:6px 8px;border:1px solid var(--rule);
+    background:var(--paper);font-family:var(--sans);font-size:13px;color:var(--ink)}
+  .f input[type=number],.f .num{font-family:var(--mono)}
+  .f input:focus,.f select:focus,.f textarea:focus{outline:2px solid var(--azul);outline-offset:-1px;border-color:var(--azul)}
+  .f .hint{font-size:10.5px;color:var(--ink-3);margin-top:3px}
+  .f textarea{min-height:56px;resize:vertical}
+  .wide{grid-column:1/-1}
+  .sw{display:flex;align-items:center;gap:9px;padding:10px 12px;border:1px solid var(--rule);
+    background:var(--paper-2);margin:4px 0 2px}
+  .sw input{width:16px;height:16px;accent-color:var(--azul);flex:0 0 auto}
+  .sw div{font-size:12.5px}
+  .sw b{display:block;font-size:13px}
+  .sw small{color:var(--ink-3);font-size:11px}
+
+  /* ---- repetibles ---- */
+  .rep{border:1px solid var(--rule);margin-bottom:9px}
+  .rep-h{display:flex;justify-content:space-between;align-items:center;background:var(--paper-2);
+    padding:5px 10px;border-bottom:1px solid var(--rule)}
+  .rep-h span{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--ink-2);font-weight:600}
+  .rep-b{padding:11px}
+  .btn{border:1px solid var(--rule);background:var(--paper);padding:5px 11px;font-size:12px;
+    cursor:pointer;color:var(--ink-2)}
+  .btn:hover{border-color:var(--azul);color:var(--azul)}
+  .btn.pri{background:var(--azul);border-color:var(--azul);color:#fff;font-weight:600}
+  .btn.pri:hover{background:#173D6C}
+  .btn.dgr{color:var(--rojo);border-color:var(--rule)}
+  .btn.dgr:hover{border-color:var(--rojo)}
+  .btn.sm{padding:3px 8px;font-size:11px}
+  .btnrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+
+  /* ---- tablero ---- */
+  .chk{display:flex;gap:10px;padding:9px 11px;border:1px solid var(--rule-2);margin-bottom:6px;align-items:flex-start}
+  .chk.r{background:var(--rojo-soft);border-color:#EBC3BF}
+  .chk.a{background:var(--ambar-soft);border-color:#EBDCC0}
+  .chk.v{background:var(--verde-soft);border-color:#C6E0D0}
+  .dot{width:9px;height:9px;border-radius:50%;flex:0 0 auto;margin-top:5px}
+  .dot.r{background:var(--rojo)}.dot.a{background:var(--ambar)}.dot.v{background:var(--verde)}
+  .chk b{font-size:12.5px;display:block}
+  .chk .val{font-family:var(--mono);font-size:12px;color:var(--ink-2)}
+  .chk small{color:var(--ink-3);font-size:11px;display:block;margin-top:2px}
+  .tally{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+  .tally div{font-family:var(--mono);font-size:11.5px;padding:5px 11px;border:1px solid var(--rule)}
+  .tally .r{background:var(--rojo-soft);color:var(--rojo);border-color:#EBC3BF}
+  .tally .a{background:var(--ambar-soft);color:var(--ambar);border-color:#EBDCC0}
+  .tally .v{background:var(--verde-soft);color:var(--verde);border-color:#C6E0D0}
+
+  /* ---- tabla derivados ---- */
+  table.calc{width:100%;border-collapse:collapse;font-size:12.5px;margin-bottom:8px}
+  table.calc th{text-align:left;font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--ink-3);border-bottom:1px solid var(--rule);padding:5px 8px 5px 0;font-weight:600}
+  table.calc td{padding:5px 8px 5px 0;border-bottom:1px solid var(--rule-2);vertical-align:top}
+  table.calc td.n{font-family:var(--mono);text-align:right;white-space:nowrap}
+  table.calc td.c{font-family:var(--mono);color:var(--ink-3);font-size:11px;width:44px}
+
+  /* ---- proyectos ---- */
+  .plist{border:1px solid var(--rule)}
+  .pitem{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 12px;
+    border-bottom:1px solid var(--rule-2)}
+  .pitem:last-child{border-bottom:0}
+  .pitem.on{background:var(--azul-soft)}
+  .pitem b{font-size:13px}
+  .pitem small{color:var(--ink-3);font-family:var(--mono);font-size:10.5px;display:block}
+  .empty{padding:26px 14px;text-align:center;color:var(--ink-3);font-size:12.5px;border:1px dashed var(--rule)}
+
+  /* ---- ficha ---- */
+  .ficha{width:100%;height:400px;font-family:var(--mono);font-size:11px;line-height:1.55;
+    border:1px solid var(--rule);padding:12px;background:var(--paper-2);color:var(--ink);resize:vertical}
+  .note{border-left:3px solid var(--azul);background:var(--azul-soft);padding:10px 12px;
+    font-size:12px;margin:12px 0}
+  .note.warn{border-left-color:var(--ambar);background:var(--ambar-soft)}
+
+  /* ---- barra cota inferior ---- */
+  .bar{position:sticky;bottom:0;background:var(--paper);border-top:2px solid var(--ink);
+    padding:9px 0 4px;margin-top:20px;display:flex;gap:20px;flex-wrap:wrap;align-items:center}
+  .bar .cell{display:flex;flex-direction:column;gap:1px}
+  .bar .k{font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+  .bar .v{font-family:var(--mono);font-size:13px;font-weight:600}
+  .bar .v.r{color:var(--rojo)}.bar .v.a{color:var(--ambar)}.bar .v.v{color:var(--verde)}
+  .bar .sp{flex:1}
+  .toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;
+    padding:9px 16px;font-size:12.5px;z-index:99;opacity:0;transition:opacity .2s;pointer-events:none}
+  .toast.on{opacity:1}
+
+  @media(max-width:720px){
+    .shell{grid-template-columns:1fr}
+    .rail{border-right:0;border-bottom:1px solid var(--rule);padding:8px 0 10px;
+      display:flex;gap:4px;overflow-x:auto}
+    .rail button{width:auto;white-space:nowrap;border-left:0;border-bottom:2px solid transparent;padding:6px 10px}
+    .rail button.on{border-left:0;border-bottom-color:var(--azul)}
+    .rail .grp{display:none}
+    .pane{padding:16px 0}
+  }
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="mdapp">
+  <div class="hd">
+    <div class="hd-row">
+      <div>
+        <h1>Captura de variables — Memoria descriptiva</h1>
+        <p>Vivienda plurifamiliar · Ciudad de México · v1</p>
+      </div>
+      <div class="proj-chip" id="chip">Sin proyecto abierto</div>
+    </div>
+  </div>
+
+  <div class="shell">
+    <nav class="rail" id="rail"></nav>
+    <main class="pane" id="pane"></main>
+  </div>
+
+  <div class="bar" id="bar"></div>
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ============================================================
+   ESTADO
+   ============================================================ */
+var S = null;          // proyecto abierto
+var IDX = [];          // índice de proyectos
+var VIEW = "proy";
+var DIRTY = false;
+
+function nuevoProyecto(nombre){
+  return {
+    id: "p" + Date.now(),
+    nombre: nombre || "Proyecto sin nombre",
+    actualizado: new Date().toISOString(),
+    ident:{denominacion:"",calle:"",colonia:"",alcaldia:"",cp:"",propietario:"",dro:"",proyectista:"",fecha:"",despacho:""},
+    predio:{
+      fusion:false, origen:[], docFusion:{tipo:"",numero:"",autoridad:"",fecha:""},
+      supEscritura:"", supLevantamiento:"", forma:"Rectangular", frentes:"1", vialidad:"",
+      numOficial:"", escritura:"", linderos:[], cuentaCatastral:"", alineamiento:""
+    },
+    suelo:{
+      folio:"", fecha:"", clave:"", uso:"", niveles:"", areaLibre:"", densidad:"", densidadM2:"",
+      norma:"",
+      pot:{activo:false, instrumento:"", folio:"", autoridad:"", fecha:"", m2:"", emisor:"",
+           modNiveles:false, nivelesExtra:"", modAreaLibre:false, areaLibreNueva:"", modDensidad:false, densidadNueva:""}
+    },
+    niveles:{banqueta:"0.00", pretil:"", lista:[]},
+    viv:{total:"", porNivel:[], supMin:"", supMax:"", prototipos:"", locales:"", recamaras:"",
+         alturaLibre:"", anchoRec:"", anchoOtros:"", anchoEstancia:""},
+    patios:{nptHab:"", nivelParamento:"", cubierta:false, tipoCubierta:"", alturaCubierta:"", lista:[]},
+    estac:{niveles:[], rampas:[], pcdCant:"", pcdDim:"", angulo:"90", pasillo:"", accesos:"", maxPorViv:"3"},
+    elev:{nucleos:"", cantidad:"", nivelesServidos:"", capCabina:"10", rtt:"90", pctDiseno:"10",
+          intervalo:"60", ocupRec:"2", adicional:"1", escaleras:""},
+    comunes:{control:"", amenidades:"", servicios:"", tecnicas:"", bodegas:"", bici:"", basura:""},
+    graficos:[],
+    pendientes:""
+  };
+}
+
+var GRAFICOS_BASE = [
+  ["Croquis de ubicación","1.1 Características del predio",true],
+  ["Plano de la fusión de predios","1.2 Antecedentes de propiedad y fusión",false],
+  ["Recorte del PDDU","1.3 Uso de suelo",true],
+  ["Tabla de densidades","1.3 Uso de suelo",false],
+  ["Simbología de suelo urbano","1.3 Uso de suelo",false],
+  ["Tabla de ocupación del suelo (COS)","1.4 COS",true],
+  ["Tabla de utilización del suelo (CUS)","1.5 CUS",true],
+  ["Tabla de superficies por nivel","1.5 CUS",true],
+  ["Diagrama de niveles y superficies","1.5 CUS",false],
+  ["Planta arquitectónica de semisótano","2.1 Descripción por niveles",true],
+  ["Planta arquitectónica de planta baja","2.2 Descripción por niveles",true],
+  ["Planta arquitectónica de nivel tipo","2.3 Descripción por niveles",true],
+  ["Planta de azotea","2.4 Azotea y techos",true],
+  ["Detalle de cubierta en azotea","2.4 Azotea y techos",false],
+  ["Corte arquitectónico transversal","2.5 Alturas",true],
+  ["Esquema de patio mínimo normativo","2.6 Cálculo de patios",true],
+  ["Esquema de patio tipo del proyecto","2.6 Cálculo de patios",true],
+  ["Esquema de patio posterior","2.6 Cálculo de patios",false]
+];
+
+/* ============================================================
+   ALMACENAMIENTO
+   ============================================================ */
+async function cargarIndice(){
+  try{
+    var r = await window.storage.get("mem:index");
+    IDX = r && r.value ? JSON.parse(r.value) : [];
+  }catch(e){ IDX = []; }
+}
+async function guardarIndice(){
+  try{ await window.storage.set("mem:index", JSON.stringify(IDX)); }
+  catch(e){ toast("No se pudo guardar el índice de proyectos"); }
+}
+async function guardar(silencio){
+  if(!S) return;
+  S.actualizado = new Date().toISOString();
+  try{
+    await window.storage.set("mem:proj:"+S.id, JSON.stringify(S));
+    var i = IDX.findIndex(function(x){return x.id===S.id});
+    var meta = {id:S.id, nombre:S.nombre, actualizado:S.actualizado};
+    if(i>=0) IDX[i]=meta; else IDX.unshift(meta);
+    await guardarIndice();
+    DIRTY=false;
+    if(!silencio) toast("Proyecto guardado");
+    pintarChip();
+  }catch(e){ toast("No se pudo guardar. Revisa la conexión e inténtalo otra vez"); }
+}
+async function abrir(id){
+  try{
+    var r = await window.storage.get("mem:proj:"+id);
+    S = JSON.parse(r.value);
+    // migración defensiva de campos añadidos después
+    var base = nuevoProyecto();
+    for(var k in base){ if(!(k in S)) S[k]=base[k]; }
+    if(!S.graficos || !S.graficos.length) S.graficos = graficosIniciales();
+    VIEW="ident"; render();
+  }catch(e){ toast("No se pudo abrir el proyecto"); }
+}
+async function borrar(id){
+  try{
+    await window.storage.delete("mem:proj:"+id);
+    IDX = IDX.filter(function(x){return x.id!==id});
+    await guardarIndice();
+    if(S && S.id===id){ S=null; VIEW="proy"; }
+    render(); toast("Proyecto eliminado");
+  }catch(e){ toast("No se pudo eliminar el proyecto"); }
+}
+function graficosIniciales(){
+  return GRAFICOS_BASE.map(function(g,i){
+    return {id:i+1, nombre:g[0], seccion:g[1], obligatorio:g[2], estado:"Pendiente"};
+  });
+}
+
+/* ============================================================
+   UTILIDADES
+   ============================================================ */
+function n(v){ var x=parseFloat(String(v).replace(/,/g,"")); return isNaN(x)?null:x; }
+function fmt(v,d){ if(v===null||v===undefined||isNaN(v)) return "—";
+  return Number(v).toLocaleString("es-MX",{minimumFractionDigits:d===undefined?2:d,maximumFractionDigits:d===undefined?2:d}); }
+function esc(s){ return String(s===null||s===undefined?"":s)
+  .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function get(path){ var o=S,p=path.split("."); for(var i=0;i<p.length;i++){ if(o===undefined||o===null) return ""; o=o[p[i]]; } return o===undefined||o===null?"":o; }
+function set(path,val){ var o=S,p=path.split("."); for(var i=0;i<p.length-1;i++){ if(!o[p[i]]) o[p[i]]={}; o=o[p[i]]; } o[p[p.length-1]]=val; DIRTY=true; }
+var tt=null;
+function toast(m){ var t=document.getElementById("toast"); t.textContent=m; t.classList.add("on");
+  clearTimeout(tt); tt=setTimeout(function(){t.classList.remove("on")},2200); }
+
+/* ============================================================
+   MOTOR DE CÁLCULO
+   ============================================================ */
+function calc(){
+  var c={};
+  var p=S.predio, s=S.suelo;
+
+  // --- superficie del predio ---
+  c.sumaOrigen = p.fusion ? p.origen.reduce(function(a,b){ return a + (n(b.sup)||0) },0) : null;
+  c.supEscritura = p.fusion ? (c.sumaOrigen||null) : n(p.supEscritura);
+  c.supLevantamiento = n(p.supLevantamiento);
+  c.supPredio = c.supLevantamiento !== null ? c.supLevantamiento : c.supEscritura;
+  c.difSup = (c.supEscritura!==null && c.supLevantamiento!==null) ? (c.supLevantamiento - c.supEscritura) : null;
+
+  // --- coeficientes ---
+  var al = n(s.areaLibre), niv = n(s.niveles);
+  c.areaLibrePct = al; c.nivelesPermitidos = niv;
+  c.cos = (c.supPredio!==null && al!==null) ? c.supPredio*(1-al/100) : null;
+  c.areaLibreReq = (c.supPredio!==null && al!==null) ? c.supPredio*(al/100) : null;
+  c.factorCUS = (al!==null && niv!==null) ? (1-al/100)*niv : null;
+  c.supMaxBase = (c.cos!==null && niv!==null) ? c.cos*niv : null;
+  c.potM2 = s.pot.activo ? n(s.pot.m2) : null;
+  c.supMaxTotal = c.supMaxBase!==null ? c.supMaxBase + (c.potM2||0) : null;
+
+  // --- niveles ---
+  var L=S.niveles.lista;
+  c.supSNB = L.filter(function(x){return x.snb}).reduce(function(a,b){ return a+(n(b.hab)||0)+(n(b.noHab)||0) },0);
+  c.supBNB = L.filter(function(x){return !x.snb}).reduce(function(a,b){ return a+(n(b.hab)||0)+(n(b.noHab)||0) },0);
+  c.supTotal = c.supSNB + c.supBNB;
+  var d = L.filter(function(x){return x.desplante});
+  c.desplante = d.length ? d.reduce(function(a,b){ return a+(n(b.hab)||0)+(n(b.noHab)||0) },0) : null;
+  c.nivelesProyectados = L.filter(function(x){return x.cuenta}).length;
+  c.holguraCOS = (c.cos!==null && c.desplante!==null) ? c.cos-c.desplante : null;
+  c.pctDesplante = (c.desplante!==null && c.supPredio) ? c.desplante/c.supPredio*100 : null;
+  c.areaLibreReal = (c.supPredio!==null && c.desplante!==null) ? c.supPredio-c.desplante : null;
+  c.pctAreaLibre = (c.areaLibreReal!==null && c.supPredio) ? c.areaLibreReal/c.supPredio*100 : null;
+  c.holguraCUS = (c.supMaxTotal!==null) ? c.supMaxTotal-c.supSNB : null;
+  c.nivelesTope = niv!==null ? niv + (s.pot.activo && s.pot.modNiveles ? (n(s.pot.nivelesExtra)||0) : 0) : null;
+
+  // --- vivienda y densidad ---
+  var tv=n(S.viv.total);
+  c.totalViviendas = tv;
+  c.sumaPorNivel = S.viv.porNivel.reduce(function(a,b){ return a+(n(b.cant)||0) },0);
+  var dm2 = s.pot.activo && s.pot.modDensidad ? n(s.pot.densidadNueva) : n(s.densidadM2);
+  c.densidadM2 = dm2;
+  c.vivPermitidas = (dm2 && c.supPredio!==null) ? Math.floor(c.supPredio/dm2) : null;
+
+  // --- población y elevadores ---
+  var e=S.elev;
+  c.poblacion = tv!==null ? tv*((n(e.ocupRec)||0)*(n(e.recamaras)||n(S.viv.recamaras)||0)+(n(e.adicional)||0)) : null;
+  c.movilizar = (c.poblacion!==null && n(e.pctDiseno)!==null) ? c.poblacion*n(e.pctDiseno)/100 : null;
+  c.capElev = (n(e.rtt)&&n(e.capCabina)) ? (300/n(e.rtt))*n(e.capCabina) : null;
+  c.elevTeorico = (c.movilizar!==null && c.capElev) ? c.movilizar/c.capElev : null;
+  c.elevMin = c.elevTeorico!==null ? Math.ceil(c.elevTeorico) : null;
+
+  // --- patios ---
+  var pa=S.patios;
+  var sup = n(pa.nivelParamento), inf = n(pa.nptHab);
+  c.alturaParamento = (sup!==null && inf!==null) ? sup-(inf+0.90) : null;
+  c.ladoMin = c.alturaParamento!==null ? c.alturaParamento/3 : null;
+  c.ladoReducido = c.ladoMin!==null ? c.ladoMin*0.8 : null;
+  c.ortogonalReq = c.ladoMin!==null ? c.ladoMin*1.2 : null;
+  c.patios = pa.lista.map(function(x){
+    var corto=n(x.corto), largo=n(x.largo), r={nombre:x.nombre||"Patio", cant:n(x.cant)||1, corto:corto, largo:largo};
+    if(corto===null||largo===null||c.ladoMin===null){ r.estado="sin datos"; return r; }
+    r.sup = corto*largo;
+    if(corto >= c.ladoMin - 0.0001){ r.estado="cumple"; r.deficit=0; }
+    else if(corto >= c.ladoReducido - 0.0001 && largo >= c.ortogonalReq - 0.0001){ r.estado="cumple con reducción"; r.deficit=0; }
+    else { r.estado="no cumple"; r.deficit = Math.max(c.ladoReducido-corto, 0); r.faltaOrtogonal = largo < c.ortogonalReq; }
+    return r;
+  });
+
+  // --- estacionamiento ---
+  var g=0,ch=0;
+  S.estac.niveles.forEach(function(x){ g+=n(x.grandes)||0; ch+=n(x.chicos)||0; });
+  c.cajGrandes=g; c.cajChicos=ch; c.cajTotal=g+ch;
+  c.cajMax = (tv!==null && n(S.estac.maxPorViv)!==null) ? tv*n(S.estac.maxPorViv) : null;
+  c.pctGrandes = c.cajTotal ? g/c.cajTotal*100 : null;
+  c.pctChicos = c.cajTotal ? ch/c.cajTotal*100 : null;
+  c.ratioCajones = (c.cajMax) ? c.cajTotal/c.cajMax : null;
+  c.rampas = S.estac.rampas.map(function(r){
+    var lo=n(r.long), pe=n(r.pend), de=n(r.desnivel), o={long:lo,ancho:r.ancho,pend:pe,desnivel:de};
+    if(lo!==null&&pe!==null){ o.salva = lo*pe/100; o.dif = de!==null ? o.salva-de : null; }
+    return o;
+  });
+  return c;
+}
+
+/* ============================================================
+   SEMÁFORO  (solo vive aquí; nunca entra al documento)
+   ============================================================ */
+function revisar(c){
+  var A=[];
+  function add(l,t,v,d){ A.push({l:l,t:t,v:v,d:d}); }
+
+  if(c.supPredio===null) add("a","Superficie del predio sin capturar","—","Sin ella no se calcula ningún coeficiente");
+  if(c.difSup!==null && Math.abs(c.difSup)>0.005)
+    add("a","Escritura y levantamiento no coinciden", fmt(c.difSup)+" m²",
+      "Decide con cuál se calcula y déjalo justificado. Es un error que se arrastra hasta el CUS");
+
+  if(c.holguraCUS!==null){
+    if(c.holguraCUS < -0.005) add("r","CUS excedido", fmt(c.holguraCUS)+" m²","La superficie sobre banqueta supera el máximo permitido");
+    else if(c.holguraCUS < 0.005) add("r","CUS agotado al 100%","0.00 m²","Cero tolerancia: cualquier criterio distinto del revisor tira el proyecto");
+    else if(c.holguraCUS < 30) add("a","Holgura de CUS muy corta", fmt(c.holguraCUS)+" m²","Deja al menos 30 m² de margen");
+    else add("v","Holgura de CUS", fmt(c.holguraCUS)+" m²","");
+  }
+  if(c.holguraCOS!==null){
+    if(c.holguraCOS < -0.005) add("r","Desplante mayor que el COS", fmt(c.holguraCOS)+" m²","El área libre proyectada es menor que la exigida");
+    else if(c.holguraCOS < 10) add("a","Holgura de COS corta", fmt(c.holguraCOS)+" m²","");
+    else add("v","Holgura de COS", fmt(c.holguraCOS)+" m²","");
+  }
+  if(c.nivelesTope!==null && c.nivelesProyectados){
+    if(c.nivelesProyectados > c.nivelesTope)
+      add("r","Niveles proyectados por encima del tope", c.nivelesProyectados+" vs "+c.nivelesTope,
+        S.suelo.pot.activo ? "El potencial adquirido suma superficie, no necesariamente niveles" : "Revisa contra el certificado");
+    else add("v","Niveles dentro del tope", c.nivelesProyectados+" de "+c.nivelesTope,"");
+  }
+  if(c.vivPermitidas!==null && c.totalViviendas!==null){
+    if(c.totalViviendas > c.vivPermitidas)
+      add("r","Viviendas por encima de la densidad", c.totalViviendas+" vs "+c.vivPermitidas,"Resuelve qué densidad aplica antes de generar el documento");
+    else add("v","Viviendas dentro de la densidad", c.totalViviendas+" de "+c.vivPermitidas,"");
+  } else if(c.totalViviendas!==null){
+    add("a","Densidad sin aterrizar","—","Captura los m² de terreno por vivienda que aplican a este predio");
+  }
+  if(c.totalViviendas!==null && c.sumaPorNivel && Math.abs(c.sumaPorNivel-c.totalViviendas)>0)
+    add("r","Las viviendas por nivel no suman el total", c.sumaPorNivel+" vs "+c.totalViviendas,"");
+
+  if(c.alturaParamento===null) add("a","Altura de paramento de patios sin definir","—","Faltan el NPT habitable más bajo o el nivel superior del paramento");
+  c.patios.forEach(function(p){
+    if(p.estado==="no cumple")
+      add("r","Patio «"+p.nombre+"» por debajo del mínimo", fmt(p.corto)+" m",
+        "Faltan "+fmt(p.deficit)+" m para el mínimo reducido de "+fmt(c.ladoReducido)+" m"+(p.faltaOrtogonal?". Además la ortogonal no llega a "+fmt(c.ortogonalReq)+" m":""));
+    else if(p.estado==="cumple con reducción")
+      add("a","Patio «"+p.nombre+"» cumple solo con la reducción de 1/5", fmt(p.corto)+" m","Sin margen si cambia la altura de paramento");
+    else if(p.estado==="cumple")
+      add("v","Patio «"+p.nombre+"»", fmt(p.corto)+" × "+fmt(p.largo)+" m","");
+  });
+  if(S.patios.cubierta)
+    add("a","Patios con cubierta","—","Verifica en la NTC vigente si un patio normativo admite cubrirse sin perder su función");
+
+  if(c.pctGrandes!==null){
+    if(c.pctGrandes < 40) add("r","Cajones grandes por debajo del 40%", fmt(c.pctGrandes,1)+"%",
+      "Faltan "+Math.ceil(c.cajTotal*0.4 - c.cajGrandes)+" cajones grandes");
+    else if(c.pctGrandes < 42) add("a","Cajones grandes al límite", fmt(c.pctGrandes,1)+"%","");
+    else add("v","Cajones grandes", fmt(c.pctGrandes,1)+"%","");
+  }
+  if(c.ratioCajones!==null && c.ratioCajones>1)
+    add("r","Cajones por encima del máximo permitido", c.cajTotal+" vs "+c.cajMax,"");
+  c.rampas.forEach(function(r,i){
+    if(r.dif!==null && Math.abs(r.dif)>0.02)
+      add("a","Rampa "+(i+1)+": longitud y pendiente no dan el desnivel", fmt(r.salva)+" vs "+fmt(r.desnivel)+" m","");
+  });
+  if(c.elevMin!==null && n(S.elev.cantidad)!==null){
+    if(n(S.elev.cantidad) < c.elevMin) add("r","Elevadores por debajo del mínimo", S.elev.cantidad+" vs "+c.elevMin,"");
+    else add("v","Elevadores", S.elev.cantidad+" (mínimo "+c.elevMin+")","");
+  }
+  if(S.suelo.pot.activo && !S.suelo.pot.instrumento)
+    add("a","Instrumento de potencial sin identificar","—","Pendiente por confirmar. El documento no debe nombrar un instrumento que no esté verificado");
+  if(S.predio.fusion && !S.predio.docFusion.tipo)
+    add("a","Documento que avala la fusión sin identificar","—","Pendiente por confirmar");
+  return A;
+}
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+var SECC = [
+  ["proy","",   "Proyectos"],
+  ["ident","B1","Identificación"],
+  ["predio","B2","Predio y fusión"],
+  ["suelo","B3","Uso de suelo"],
+  ["niv","B4","Niveles y alturas"],
+  ["viv","B5","Programa de vivienda"],
+  ["pat","B6","Patios"],
+  ["est","B7","Estacionamiento"],
+  ["ele","B8","Circulación vertical"],
+  ["com","B9","Áreas comunes"],
+  ["gra","G","Gráficos"],
+  ["tab","","Tablero de revisión"],
+  ["fic","","Ficha de salida"]
+];
+
+function render(){
+  pintarRail(); pintarChip();
+  var pane=document.getElementById("pane");
+  if(!S && VIEW!=="proy") VIEW="proy";
+  pane.innerHTML = ({
+    proy:vProyectos, ident:vIdent, predio:vPredio, suelo:vSuelo, niv:vNiveles, viv:vViv,
+    pat:vPatios, est:vEstac, ele:vElev, com:vComunes, gra:vGraficos, tab:vTablero, fic:vFicha
+  })[VIEW]();
+  enlazar(pane);
+  pintarBarra();
+}
+function pintarRail(){
+  var r=document.getElementById("rail"), h="";
+  SECC.forEach(function(s,i){
+    if(i===1) h+='<div class="grp">Captura</div>';
+    if(s[0]==="tab") h+='<div class="grp">Salida</div>';
+    var dis = (!S && s[0]!=="proy");
+    h+='<button data-v="'+s[0]+'" class="'+(VIEW===s[0]?"on":"")+'"'+(dis?' disabled style="opacity:.35;cursor:not-allowed"':'')+'>'+
+       '<span class="cod">'+esc(s[1])+'</span><span>'+esc(s[2])+'</span></button>';
+  });
+  r.innerHTML=h;
+  r.querySelectorAll("button").forEach(function(b){
+    b.onclick=function(){ if(b.disabled) return; VIEW=b.dataset.v; render(); };
+  });
+}
+function pintarChip(){
+  document.getElementById("chip").textContent = S ? (S.nombre + (DIRTY?" · sin guardar":"")) : "Sin proyecto abierto";
+}
+function pintarBarra(){
+  var b=document.getElementById("bar");
+  if(!S){ b.innerHTML='<div class="cell"><span class="k">Estado</span><span class="v">Abre o crea un proyecto para empezar</span></div>'; return; }
+  var c=calc(), A=revisar(c);
+  var nr=A.filter(function(x){return x.l==="r"}).length, na=A.filter(function(x){return x.l==="a"}).length;
+  function cell(k,v,cl){ return '<div class="cell"><span class="k">'+k+'</span><span class="v '+(cl||"")+'">'+v+'</span></div>'; }
+  b.innerHTML =
+    cell("Predio", c.supPredio!==null?fmt(c.supPredio)+" m²":"—") +
+    cell("COS", c.cos!==null?fmt(c.cos)+" m²":"—") +
+    cell("CUS máx", c.supMaxTotal!==null?fmt(c.supMaxTotal)+" m²":"—") +
+    cell("Holgura CUS", c.holguraCUS!==null?fmt(c.holguraCUS)+" m²":"—",
+      c.holguraCUS===null?"":(c.holguraCUS<0.005?"r":(c.holguraCUS<30?"a":"v"))) +
+    '<div class="sp"></div>' +
+    cell("Revisión", (nr?nr+" en rojo · ":"")+(na?na+" en ámbar":(nr?"":"sin alertas")), nr?"r":(na?"a":"v")) +
+    '<div class="cell"><button class="btn pri" id="bsave">Guardar</button></div>';
+  var bs=document.getElementById("bsave"); if(bs) bs.onclick=function(){ guardar(); };
+}
+
+/* --- constructores de campo --- */
+function F(path,label,opt){
+  opt=opt||{};
+  var v=esc(get(path));
+  var h='<div class="f'+(opt.wide?" wide":"")+'"><label>'+esc(label)+'</label>';
+  if(opt.type==="select"){
+    h+='<select data-p="'+path+'">';
+    opt.opts.forEach(function(o){ h+='<option'+(String(get(path))===String(o)?" selected":"")+'>'+esc(o)+'</option>'; });
+    h+='</select>';
+  } else if(opt.type==="area"){
+    h+='<textarea data-p="'+path+'" placeholder="'+esc(opt.ph||"")+'">'+v+'</textarea>';
+  } else {
+    h+='<input data-p="'+path+'" type="'+(opt.type==="num"?"number":"text")+'"'+
+       (opt.type==="num"?' step="any"':'')+' value="'+v+'" placeholder="'+esc(opt.ph||"")+'">';
+  }
+  if(opt.hint) h+='<div class="hint">'+esc(opt.hint)+'</div>';
+  return h+'</div>';
+}
+function SW(path,titulo,desc){
+  return '<div class="sw"><input type="checkbox" data-p="'+path+'" data-t="check"'+(get(path)?" checked":"")+'>'+
+    '<div><b>'+esc(titulo)+'</b><small>'+esc(desc||"")+'</small></div></div>';
+}
+function COTA(t){ return '<div class="cota"><span>'+esc(t)+'</span><i></i></div>'; }
+function enlazar(root){
+  root.querySelectorAll("[data-p]").forEach(function(el){
+    var ev = el.tagName==="SELECT"||el.type==="checkbox" ? "change" : "input";
+    el.addEventListener(ev,function(){
+      set(el.dataset.p, el.type==="checkbox" ? el.checked : el.value);
+      pintarBarra(); pintarChip();
+      if(el.type==="checkbox") render();
+    });
+  });
+}
+
+/* --- repetibles --- */
+function rep(titulo, arr, campos, path, etiqueta){
+  var h='';
+  arr.forEach(function(item,i){
+    h+='<div class="rep"><div class="rep-h"><span>'+esc(etiqueta)+" "+(i+1)+'</span>'+
+       '<button class="btn sm dgr" data-del="'+path+'" data-i="'+i+'">Quitar</button></div><div class="rep-b"><div class="grid">';
+    campos.forEach(function(cp){ h+=F(path+"."+i+"."+cp[0], cp[1], cp[2]||{}); });
+    h+='</div></div></div>';
+  });
+  if(!arr.length) h+='<div class="empty">Aún no hay '+esc(etiqueta.toLowerCase())+'. Añade el primero.</div>';
+  h+='<div class="btnrow"><button class="btn" data-add="'+path+'">Añadir '+esc(etiqueta.toLowerCase())+'</button></div>';
+  return h;
+}
+function acciones(root){
+  root.querySelectorAll("[data-add]").forEach(function(b){
+    b.onclick=function(){
+      var p=b.dataset.add.split("."), o=S;
+      for(var i=0;i<p.length;i++) o=o[p[i]];
+      o.push({}); DIRTY=true; render();
+    };
+  });
+  root.querySelectorAll("[data-del]").forEach(function(b){
+    b.onclick=function(){
+      var p=b.dataset.del.split("."), o=S;
+      for(var i=0;i<p.length;i++) o=o[p[i]];
+      o.splice(parseInt(b.dataset.i,10),1); DIRTY=true; render();
+    };
+  });
+}
+var _render=render;
+render=function(){ _render(); acciones(document.getElementById("pane")); };
+
+/* ============================================================
+   VISTAS
+   ============================================================ */
+function vProyectos(){
+  var h='<h2>Proyectos</h2><p class="sub">Cada proyecto guarda sus propios datos. Puedes volver a cualquiera para corregir una memoria ya entregada.</p>';
+  h+='<div class="btnrow" style="margin:0 0 14px"><button class="btn pri" id="bnew">Crear proyecto</button>'+
+     (S?'<button class="btn" id="bdup">Duplicar el abierto</button>':'')+'</div>';
+  if(!IDX.length){ h+='<div class="empty">No hay proyectos todavía. Crea el primero para empezar a capturar.</div>'; }
+  else{
+    h+='<div class="plist">';
+    IDX.forEach(function(p){
+      var f=new Date(p.actualizado);
+      h+='<div class="pitem'+(S&&S.id===p.id?" on":"")+'"><div><b>'+esc(p.nombre)+'</b>'+
+         '<small>'+f.toLocaleDateString("es-MX")+" "+f.toLocaleTimeString("es-MX",{hour:"2-digit",minute:"2-digit"})+'</small></div>'+
+         '<div style="display:flex;gap:6px"><button class="btn sm" data-open="'+p.id+'">Abrir</button>'+
+         '<button class="btn sm dgr" data-rm="'+p.id+'">Eliminar</button></div></div>';
+    });
+    h+='</div>';
+  }
+  if(S) h+=COTA("Proyecto abierto")+F("nombre","Nombre del proyecto",{wide:true,hint:"Solo para localizarlo en esta lista"});
+  setTimeout(function(){
+    var bn=document.getElementById("bnew");
+    if(bn) bn.onclick=async function(){
+      S=nuevoProyecto("Proyecto "+(IDX.length+1)); S.graficos=graficosIniciales();
+      await guardar(true); VIEW="ident"; render(); toast("Proyecto creado");
+    };
+    var bd=document.getElementById("bdup");
+    if(bd) bd.onclick=async function(){
+      var copia=JSON.parse(JSON.stringify(S));
+      copia.id="p"+Date.now(); copia.nombre=S.nombre+" (copia)";
+      S=copia; await guardar(true); render(); toast("Proyecto duplicado");
+    };
+    document.querySelectorAll("[data-open]").forEach(function(b){ b.onclick=function(){ abrir(b.dataset.open); }; });
+    document.querySelectorAll("[data-rm]").forEach(function(b){ b.onclick=function(){ borrar(b.dataset.rm); }; });
+  },0);
+  return h;
+}
+
+function vIdent(){
+  return '<h2>B1 · Identificación</h2><p class="sub">Portada y firmas del documento.</p><div class="grid">'+
+    F("ident.denominacion","Denominación del proyecto",{wide:true,ph:"Desarrollo habitacional plurifamiliar"})+
+    F("ident.calle","Calle y número oficial",{ph:"Av. …  #000"})+
+    F("ident.colonia","Colonia")+
+    F("ident.alcaldia","Alcaldía",{hint:"Determina qué PDDU aplica"})+
+    F("ident.cp","Código postal")+
+    F("ident.propietario","Propietario")+
+    F("ident.dro","DRO")+
+    F("ident.proyectista","Proyectista")+
+    F("ident.fecha","Fecha del documento",{ph:"Marzo 2026"})+
+    F("ident.despacho","Despacho")+
+    '</div>';
+}
+
+function vPredio(){
+  var h='<h2>B2 · Predio y fusión</h2><p class="sub">De aquí sale la superficie que gobierna todos los coeficientes.</p>';
+  h+=SW("predio.fusion","El predio proviene de la fusión de varios predios",
+      "Enciende una sección nueva en el documento y cambia el origen de la superficie");
+  if(S.predio.fusion){
+    h+=COTA("Predios de origen");
+    h+='<div class="note">Se asume que todos los predios de origen comparten la misma zonificación. Si alguno difiere, avísame antes de generar la memoria: el cálculo tendría que hacerse por porciones.</div>';
+    h+=rep("Predios",S.predio.origen,[
+      ["domicilio","Domicilio y número oficial",{wide:true}],
+      ["sup","Superficie según escritura (m²)",{type:"num"}],
+      ["escritura","Escritura pública núm."],
+      ["notario","Notario y número"],
+      ["folio","Folio real"],
+      ["catastral","Cuenta catastral"],
+      ["zonificacion","Zonificación propia",{hint:"Informativo"}]
+    ],"predio.origen","Predio de origen");
+    h+=COTA("Documento que avala la fusión");
+    h+='<div class="grid">'+
+      F("predio.docFusion.tipo","Tipo de documento",{ph:"Pendiente por confirmar"})+
+      F("predio.docFusion.numero","Número o folio")+
+      F("predio.docFusion.autoridad","Autoridad que lo emite")+
+      F("predio.docFusion.fecha","Fecha")+'</div>';
+    h+=COTA("Predio resultante");
+  } else { h+=COTA("Datos del predio"); }
+  h+='<div class="grid">'+
+    (S.predio.fusion?"":F("predio.supEscritura","Superficie según escritura (m²)",{type:"num"}))+
+    F("predio.supLevantamiento","Superficie según levantamiento (m²)",{type:"num",
+      hint:"Si la capturas, es la que se usa para calcular"})+
+    F("predio.numOficial","Número oficial"+(S.predio.fusion?" definitivo":""))+
+    F("predio.escritura","Escritura de compraventa núm.")+
+    F("predio.alineamiento","Constancia de alineamiento y número oficial")+
+    F("predio.cuentaCatastral","Cuenta catastral"+(S.predio.fusion?" única":""))+
+    F("predio.forma","Forma del predio",{type:"select",opts:["Rectangular","Irregular","Trapezoidal","En esquina"]})+
+    F("predio.frentes","Número de frentes",{type:"num",hint:"Una fusión suele generar más de uno"})+
+    F("predio.vialidad","Vialidad de frente",{wide:true})+'</div>';
+  h+=COTA("Linderos del predio"+(S.predio.fusion?" resultante":""));
+  h+=rep("Linderos",S.predio.linderos,[
+    ["orientacion","Orientación",{type:"select",opts:["Norte","Sur","Oriente","Poniente","Noreste","Noroeste","Sureste","Suroeste"]}],
+    ["longitud","Longitud (m)",{type:"num"}],
+    ["colindancia","Colinda con",{wide:true}]
+  ],"predio.linderos","Lindero");
+  return h;
+}
+
+function vSuelo(){
+  var h='<h2>B3 · Uso de suelo</h2><p class="sub">Copia la zonificación tal como viene en el certificado, sin interpretarla.</p><div class="grid">'+
+    F("suelo.folio","Folio del Certificado Único de Zonificación")+
+    F("suelo.fecha","Fecha del certificado")+
+    F("suelo.clave","Clave de zonificación literal",{ph:"HM/5/20/Z"})+
+    F("suelo.uso","Uso desarrollado en texto",{ph:"Habitacional mixto"})+
+    F("suelo.niveles","Niveles máximos",{type:"num"})+
+    F("suelo.areaLibre","Área libre exigida (%)",{type:"num"})+
+    F("suelo.densidad","Densidad (letra)",{ph:"Z"})+
+    F("suelo.densidadM2","m² de terreno por vivienda",{type:"num",
+      hint:"Lo que realmente aplica a este predio. Sin este dato no se valida la densidad"})+
+    F("suelo.norma","Norma de ordenación aplicada",{wide:true,ph:"Si aplica alguna"})+'</div>';
+  h+=SW("suelo.pot.activo","El proyecto usa potencial adquirido",
+      "Suma metros cuadrados de construcción sobre el CUS base");
+  if(S.suelo.pot.activo){
+    h+='<div class="note warn">El potencial adquirido suma <b>superficie de construcción</b>. No suma niveles, ni área libre, ni densidad, salvo que el instrumento lo diga expresamente. Marca abajo qué modifica realmente.</div>';
+    h+='<div class="grid">'+
+      F("suelo.pot.m2","m² de construcción adicionales",{type:"num"})+
+      F("suelo.pot.instrumento","Instrumento aplicado",{ph:"Pendiente por confirmar"})+
+      F("suelo.pot.folio","Folio o certificado")+
+      F("suelo.pot.autoridad","Autoridad emisora")+
+      F("suelo.pot.fecha","Fecha")+
+      F("suelo.pot.emisor","Predio emisor",{hint:"Si es una transferencia"})+'</div>';
+    h+=COTA("Qué más modifica el instrumento");
+    h+=SW("suelo.pot.modNiveles","También incrementa los niveles permitidos","");
+    if(S.suelo.pot.modNiveles) h+='<div class="grid">'+F("suelo.pot.nivelesExtra","Niveles adicionales",{type:"num"})+'</div>';
+    h+=SW("suelo.pot.modAreaLibre","También modifica el área libre exigida","");
+    if(S.suelo.pot.modAreaLibre) h+='<div class="grid">'+F("suelo.pot.areaLibreNueva","Nueva área libre (%)",{type:"num"})+'</div>';
+    h+=SW("suelo.pot.modDensidad","También modifica la densidad","");
+    if(S.suelo.pot.modDensidad) h+='<div class="grid">'+F("suelo.pot.densidadNueva","Nuevos m² de terreno por vivienda",{type:"num"})+'</div>';
+  }
+  return h;
+}
+
+function vNiveles(){
+  var h='<h2>B4 · Niveles y alturas</h2><p class="sub">Marca en cada nivel si está sobre banqueta, si cuenta como nivel para la altura, y si forma el desplante.</p><div class="grid">'+
+    F("niveles.banqueta","Nivel de banqueta de referencia",{ph:"0.00"})+
+    F("niveles.pretil","Nivel de pretil o remate",{type:"num",hint:"Define hasta dónde llega el paramento"})+'</div>';
+  h+=COTA("Niveles del proyecto");
+  var L=S.niveles.lista, r='';
+  L.forEach(function(x,i){
+    r+='<div class="rep"><div class="rep-h"><span>Nivel '+(i+1)+'</span>'+
+      '<button class="btn sm dgr" data-del="niveles.lista" data-i="'+i+'">Quitar</button></div><div class="rep-b"><div class="grid">'+
+      F("niveles.lista."+i+".nombre","Nombre del nivel",{ph:"Planta baja"})+
+      F("niveles.lista."+i+".npt","NPT (m)",{type:"num"})+
+      F("niveles.lista."+i+".entrepiso","Entrepiso (m)",{type:"num"})+
+      F("niveles.lista."+i+".libre","Altura libre (m)",{type:"num"})+
+      F("niveles.lista."+i+".hab","Superficie habitable (m²)",{type:"num"})+
+      F("niveles.lista."+i+".noHab","Superficie no habitable (m²)",{type:"num"})+
+      F("niveles.lista."+i+".usos","Usos que contiene",{wide:true})+
+      '</div>'+
+      SW("niveles.lista."+i+".snb","Sobre nivel de banqueta","Solo lo que está sobre banqueta computa para el CUS")+
+      SW("niveles.lista."+i+".cuenta","Cuenta como nivel para la altura","")+
+      SW("niveles.lista."+i+".desplante","Forma el área de desplante","Normalmente solo la planta baja")+
+      '</div></div>';
+  });
+  if(!L.length) r+='<div class="empty">Aún no hay niveles. Añade el primero, de abajo hacia arriba.</div>';
+  r+='<div class="btnrow"><button class="btn" data-add="niveles.lista">Añadir nivel</button></div>';
+  return h+r;
+}
+
+function vViv(){
+  var h='<h2>B5 · Programa de vivienda</h2><p class="sub">Motor de la población, los elevadores y la densidad.</p><div class="grid">'+
+    F("viv.total","Total de viviendas",{type:"num"})+
+    F("viv.recamaras","Recámaras por vivienda",{type:"num"})+
+    F("viv.supMin","Superficie mínima de vivienda (m²)",{type:"num"})+
+    F("viv.supMax","Superficie máxima de vivienda (m²)",{type:"num",hint:"Hasta 65 m² puede aplicar la exención de elevador"})+
+    F("viv.alturaLibre","Altura libre de la vivienda (m)",{type:"num"})+
+    F("viv.anchoRec","Ancho mínimo de recámaras (m)",{type:"num"})+
+    F("viv.anchoOtros","Ancho mínimo de otros habitables (m)",{type:"num"})+
+    F("viv.anchoEstancia","Ancho mínimo de estancia-comedor (m)",{type:"num"})+
+    F("viv.locales","Locales que integran la vivienda",{wide:true,type:"area",
+      ph:"Sala/comedor, cocineta, área de lavado, recámara principal, recámara secundaria, 1 baño"})+
+    F("viv.prototipos","Prototipos y superficie de cada uno",{wide:true,type:"area",ph:"Tipo A — 47.00 m² …"})+'</div>';
+  h+=COTA("Viviendas por nivel");
+  h+=rep("Viviendas",S.viv.porNivel,[
+    ["nivel","Nivel",{ph:"Planta baja"}],
+    ["cant","Viviendas",{type:"num"}]
+  ],"viv.porNivel","Renglón");
+  return h;
+}
+
+function vPatios(){
+  var c=calc();
+  var h='<h2>B6 · Patios de iluminación y ventilación</h2><p class="sub">La dimensión corta es la que decide el cumplimiento.</p><div class="grid">'+
+    F("patios.nptHab","NPT del nivel más bajo con locales habitables (m)",{type:"num"})+
+    F("patios.nivelParamento","Nivel superior del paramento del patio (m)",{type:"num",
+      hint:"Losa de azotea o pretil: define cuál y sosténlo"})+'</div>';
+  if(c.ladoMin!==null){
+    h+='<div class="note">Altura de paramento <b>'+fmt(c.alturaParamento)+' m</b> → lado mínimo <b>'+fmt(c.ladoMin)+
+       ' m</b>. Con la reducción de 1/5: <b>'+fmt(c.ladoReducido)+' m</b> siempre que la ortogonal llegue a <b>'+
+       fmt(c.ortogonalReq)+' m</b>.</div>';
+  }
+  h+=SW("patios.cubierta","Los patios llevan cubierta","");
+  if(S.patios.cubierta) h+='<div class="grid">'+
+    F("patios.tipoCubierta","Tipo de cubierta",{ph:"Material traslúcido"})+
+    F("patios.alturaCubierta","Altura sobre pretil (m)",{type:"num"})+'</div>';
+  h+=COTA("Patios del proyecto");
+  h+=rep("Patios",S.patios.lista,[
+    ["nombre","Nombre o identificador",{ph:"Patio tipo"}],
+    ["cant","Cantidad de patios iguales",{type:"num"}],
+    ["corto","Dimensión transversal (m)",{type:"num"}],
+    ["largo","Dimensión longitudinal (m)",{type:"num"}]
+  ],"patios.lista","Patio");
+  return h;
+}
+
+function vEstac(){
+  var h='<h2>B7 · Estacionamiento</h2><p class="sub">Los porcentajes se calculan solos, con dos decimales.</p><div class="grid">'+
+    F("estac.maxPorViv","Cajones máximos por vivienda",{type:"num",hint:"Tope normativo"})+
+    F("estac.pcdCant","Cajones para personas con discapacidad",{type:"num"})+
+    F("estac.pcdDim","Dimensión del cajón PcD",{ph:"5.00 × 3.80 m"})+
+    F("estac.angulo","Ángulo del cajón",{ph:"90°"})+
+    F("estac.pasillo","Ancho de pasillo de circulación (m)",{type:"num"})+
+    F("estac.accesos","Número de accesos vehiculares",{type:"num"})+'</div>';
+  h+=COTA("Cajones por nivel");
+  h+=rep("Niveles",S.estac.niveles,[
+    ["nivel","Nivel",{ph:"Semisótano"}],
+    ["grandes","Cajones grandes",{type:"num"}],
+    ["dimG","Dimensión del grande",{ph:"5.00 × 2.50 m"}],
+    ["chicos","Cajones chicos",{type:"num"}],
+    ["dimC","Dimensión del chico",{ph:"4.20 × 2.50 m"}]
+  ],"estac.niveles","Nivel");
+  h+=COTA("Rampas vehiculares");
+  h+=rep("Rampas",S.estac.rampas,[
+    ["nivel","A qué nivel conecta",{ph:"Semisótano"}],
+    ["long","Longitud (m)",{type:"num"}],
+    ["ancho","Ancho (m)",{type:"num"}],
+    ["guarnicion","Guarniciones (m)",{ph:"0.30 a cada lado"}],
+    ["pend","Pendiente (%)",{type:"num"}],
+    ["desnivel","Desnivel que salva (m)",{type:"num"}]
+  ],"estac.rampas","Rampa");
+  return h;
+}
+
+function vElev(){
+  return '<h2>B8 · Circulación vertical</h2><p class="sub">Un solo número de elevadores, sostenido en todo el documento.</p><div class="grid">'+
+    F("elev.nucleos","Núcleos de circulación vertical",{type:"num"})+
+    F("elev.cantidad","Elevadores del proyecto",{type:"num",hint:"El número real, el que aparece en planos"})+
+    F("elev.escaleras","Escaleras: número y ancho",{ph:"2 de 1.20 m"})+
+    F("elev.nivelesServidos","Niveles servidos",{ph:"Semisótano a azotea"})+
+    F("elev.capCabina","Capacidad por cabina (personas)",{type:"num"})+
+    F("elev.rtt","Tiempo de ciclo RTT (s)",{type:"num"})+
+    F("elev.pctDiseno","Porcentaje de diseño (%)",{type:"num"})+
+    F("elev.intervalo","Intervalo máximo de espera (s)",{type:"num"})+
+    F("elev.ocupRec","Ocupantes por recámara",{type:"num"})+
+    F("elev.adicional","Personas adicionales por vivienda",{type:"num"})+
+    '</div>';
+}
+
+function vComunes(){
+  return '<h2>B9 · Áreas comunes y servicios</h2><p class="sub">Se transcriben tal cual al recorrido por niveles.</p><div class="grid">'+
+    F("comunes.control","Control de acceso",{wide:true,type:"area",ph:"Caseta de vigilancia, acceso peatonal y vehicular controlados"})+
+    F("comunes.amenidades","Amenidades",{wide:true,type:"area",ph:"Salón de usos múltiples, gimnasio, patio común de acceso"})+
+    F("comunes.servicios","Servicios",{wide:true,type:"area"})+
+    F("comunes.tecnicas","Áreas técnicas",{wide:true,type:"area",ph:"Cuarto de bombas, transformador, medidores"})+
+    F("comunes.bodegas","Bodegas")+
+    F("comunes.basura","Cuarto de basura: superficie y ubicación",{ph:"00.00 m² en planta baja"})+
+    F("comunes.bici","Biciestacionamientos: cantidad y ubicación")+
+    '</div>';
+}
+
+function vGraficos(){
+  var h='<h2>Gráficos</h2><p class="sub">El artefacto no me puede enviar imágenes: los archivos me los subes tú al chat. Esta lista le dice a la memoria en qué sección va cada uno.</p>';
+  var listos=S.graficos.filter(function(g){return g.estado==="Listo"}).length;
+  var faltan=S.graficos.filter(function(g){return g.obligatorio && g.estado!=="Listo"}).length;
+  h+='<div class="tally"><div class="v">'+listos+' listos</div>'+
+     (faltan?'<div class="a">'+faltan+' obligatorios pendientes</div>':'<div class="v">sin obligatorios pendientes</div>')+'</div>';
+  S.graficos.forEach(function(g,i){
+    h+='<div class="rep"><div class="rep-h"><span>'+(g.obligatorio?"OBLIGATORIO":"OPCIONAL")+'</span>'+
+       '<span>'+esc(g.seccion)+'</span></div><div class="rep-b"><div class="grid">'+
+       F("graficos."+i+".nombre","Gráfico",{wide:true})+
+       F("graficos."+i+".seccion","Sección destino")+
+       F("graficos."+i+".estado","Estado",{type:"select",opts:["Pendiente","Listo","No aplica"]})+
+       F("graficos."+i+".pie","Pie de imagen",{wide:true})+
+       '</div></div></div>';
+  });
+  h+='<div class="btnrow"><button class="btn" data-add="graficos">Añadir gráfico</button></div>';
+  return h;
+}
+
+function vTablero(){
+  var c=calc(), A=revisar(c);
+  var nr=A.filter(function(x){return x.l==="r"}).length,
+      na=A.filter(function(x){return x.l==="a"}).length,
+      nv=A.filter(function(x){return x.l==="v"}).length;
+  var h='<h2>Tablero de revisión</h2><p class="sub">Esto es tuyo y solo tuyo. Nada de esta pantalla entra en la memoria.</p>';
+  h+='<div class="tally"><div class="r">'+nr+' rojo</div><div class="a">'+na+' ámbar</div><div class="v">'+nv+' verde</div></div>';
+  if(nr) h+='<div class="note warn">Hay '+nr+' punto'+(nr>1?"s":"")+' en rojo. Puedes generar la ficha igual, pero conviene resolverlos antes: corregir centímetros en planos cuesta minutos; corregir una memoria ya entregada, no.</div>';
+  ["r","a","v"].forEach(function(l){
+    A.filter(function(x){return x.l===l}).forEach(function(x){
+      h+='<div class="chk '+l+'"><div class="dot '+l+'"></div><div><b>'+esc(x.t)+'</b>'+
+         '<span class="val">'+esc(x.v)+'</span>'+(x.d?'<small>'+esc(x.d)+'</small>':'')+'</div></div>';
+    });
+  });
+  h+=COTA("Campos derivados");
+  var rows=[
+    ["C.01","COS (área de desplante)",c.cos,"m²"],
+    ["C.02","Área libre requerida",c.areaLibreReq,"m²"],
+    ["C.03","Factor CUS",c.factorCUS,""],
+    ["C.04","Superficie máxima base",c.supMaxBase,"m²"],
+    ["C.04b","Potencial adquirido",c.potM2,"m²"],
+    ["C.04c","Superficie máxima total",c.supMaxTotal,"m²"],
+    ["C.05","Desplante proyectado",c.desplante,"m²"],
+    ["C.05b","Porcentaje de desplante",c.pctDesplante,"%"],
+    ["C.06","Holgura de COS",c.holguraCOS,"m²"],
+    ["C.07","Área libre real",c.areaLibreReal,"m²"],
+    ["C.07b","Porcentaje de área libre",c.pctAreaLibre,"%"],
+    ["C.08","Superficie sobre banqueta",c.supSNB,"m²"],
+    ["C.08b","Superficie bajo banqueta",c.supBNB,"m²"],
+    ["C.08c","Superficie total de construcción",c.supTotal,"m²"],
+    ["C.09","Holgura de CUS",c.holguraCUS,"m²"],
+    ["C.10","Viviendas permitidas por densidad",c.vivPermitidas,""],
+    ["C.12","Población de cálculo",c.poblacion,"hab"],
+    ["C.13","Población a movilizar en 5 min",c.movilizar,"pers"],
+    ["C.14","Capacidad por elevador en 5 min",c.capElev,"pers"],
+    ["C.15","Elevadores mínimos",c.elevMin,""],
+    ["C.17","Altura de paramento del patio",c.alturaParamento,"m"],
+    ["C.18","Lado mínimo del patio",c.ladoMin,"m"],
+    ["C.19","Lado reducido 1/5",c.ladoReducido,"m"],
+    ["C.19b","Ortogonal exigida",c.ortogonalReq,"m"],
+    ["C.22","Cajones máximos permitidos",c.cajMax,""],
+    ["C.23","Cajones proyectados",c.cajTotal,""],
+    ["C.24","Cajones grandes",c.pctGrandes,"%"],
+    ["C.24b","Cajones chicos",c.pctChicos,"%"]
+  ];
+  h+='<table class="calc"><tr><th></th><th>Campo</th><th style="text-align:right">Valor</th><th></th></tr>';
+  rows.forEach(function(r){
+    var d = (r[3]===""||r[3]==="hab"||r[3]==="pers") && r[0]!=="C.03" ? 0 : 2;
+    h+='<tr><td class="c">'+r[0]+'</td><td>'+esc(r[1])+'</td><td class="n">'+
+       (r[2]===null||r[2]===undefined?"—":fmt(r[2],d))+'</td><td class="c">'+r[3]+'</td></tr>';
+  });
+  h+='</table>';
+  return h;
+}
+
+/* ============================================================
+   FICHA DE SALIDA
+   ============================================================ */
+function ficha(){
+  var c=calc(), A=revisar(c), L=[];
+  function w(s){ L.push(s===undefined?"":s); }
+  function kv(k,v,u){ if(v===null||v===undefined||v===""||v==="—") return; w("  "+k+": "+v+(u?" "+u:"")); }
+  function num(k,v,u,d){ if(v===null||v===undefined||isNaN(v)) return; w("  "+k+": "+fmt(v,d===undefined?2:d)+(u?" "+u:"")); }
+
+  w("=================================================================");
+  w("FICHA DE PROYECTO PARA GENERAR MEMORIA DESCRIPTIVA");
+  w("Generada por el artefacto de captura · "+new Date().toLocaleString("es-MX"));
+  w("=================================================================");
+  w("");
+  w("INSTRUCCIONES PARA CLAUDE");
+  w("");
+  w("Genera la memoria descriptiva del proyecto arquitectónico en un archivo");
+  w("Word, con los datos de esta ficha, siguiendo la estructura y el tono del");
+  w("documento de referencia de este proyecto (Plutarco Elías Calles 336).");
+  w("");
+  w("REGLAS DE REDACCIÓN, sin excepción:");
+  w("");
+  w("1. El documento DESCRIBE. No dictamina, no certifica y no afirma");
+  w("   cumplimiento normativo. Quien dictamina es el DRO.");
+  w("2. No incluyas el tablero de revisión ni ninguna de las alertas de esta");
+  w("   ficha. Son de uso interno.");
+  w("3. Tampoco redactes lo contrario: nunca escribas frases que confiesen un");
+  w("   incumplimiento ni que expliquen por cuántos centímetros falta algo.");
+  w("   Si un dato es problemático, se describe con neutralidad o no se");
+  w("   menciona. Ni confesión ni afirmación.");
+  w("4. No inventes números de artículo, incisos ni dimensiones mínimas. Si");
+  w("   necesitas citar la NTC y no tienes el dato verificado, redacta sin");
+  w("   citar y avísame aparte, fuera del documento.");
+  w("5. No afirmes que se verificó nada que esta ficha no contenga:");
+  w("   estructura, instalaciones, rutas de evacuación, protección civil.");
+  w("6. Un solo valor por dato en todo el documento. Si un número aparece en");
+  w("   dos secciones, debe ser el mismo.");
+  w("7. Cierra con una conclusión descriptiva del proyecto, no con un");
+  w("   dictamen de cumplimiento.");
+  w("");
+  w("Los gráficos te los subo por separado en el chat. Colócalos en la");
+  w("sección que indica la lista del final de esta ficha.");
+  w("");
+  w("=================================================================");
+  w("B1 · IDENTIFICACIÓN");
+  w("=================================================================");
+  var I=S.ident;
+  kv("Denominación",I.denominacion); kv("Domicilio",I.calle); kv("Colonia",I.colonia);
+  kv("Alcaldía",I.alcaldia); kv("Código postal",I.cp); kv("Propietario",I.propietario);
+  kv("DRO",I.dro); kv("Proyectista",I.proyectista); kv("Fecha",I.fecha); kv("Despacho",I.despacho);
+  w("");
+  w("=================================================================");
+  w("B2 · PREDIO");
+  w("=================================================================");
+  var P=S.predio;
+  if(P.fusion){
+    w("  EL PREDIO PROVIENE DE UNA FUSIÓN.");
+    w("  Incluye una sección de antecedentes de propiedad y fusión antes de");
+    w("  las características del predio, con los predios de origen listados.");
+    w("  Todos comparten la misma zonificación.");
+    w("");
+    P.origen.forEach(function(o,i){
+      w("  Predio de origen "+(i+1)+":");
+      kv("  Domicilio",o.domicilio); num("  Superficie según escritura",n(o.sup),"m²");
+      kv("  Escritura pública",o.escritura); kv("  Notario",o.notario);
+      kv("  Folio real",o.folio); kv("  Cuenta catastral",o.catastral);
+    });
+    w("");
+    num("Suma de superficies de origen",c.sumaOrigen,"m²");
+    kv("Documento que avala la fusión",P.docFusion.tipo||"PENDIENTE POR CONFIRMAR — no lo nombres en el documento");
+    kv("Número o folio del documento",P.docFusion.numero);
+    kv("Autoridad emisora",P.docFusion.autoridad);
+    kv("Fecha",P.docFusion.fecha);
+    w("");
+  }
+  num("Superficie según escritura",c.supEscritura,"m²");
+  num("Superficie según levantamiento",c.supLevantamiento,"m²");
+  num("SUPERFICIE QUE GOBIERNA EL CÁLCULO",c.supPredio,"m²");
+  kv("Forma",P.forma); kv("Número de frentes",P.frentes); kv("Vialidad de frente",P.vialidad);
+  kv("Número oficial",P.numOficial); kv("Escritura de compraventa",P.escritura);
+  kv("Alineamiento y número oficial",P.alineamiento); kv("Cuenta catastral",P.cuentaCatastral);
+  if(P.linderos.length){
+    w("  Linderos:");
+    P.linderos.forEach(function(l){
+      w("    Al "+(l.orientacion||"—").toLowerCase()+" en "+(l.longitud||"—")+" m con "+(l.colindancia||"—"));
+    });
+  }
+  w("");
+  w("=================================================================");
+  w("B3 · USO DE SUELO");
+  w("=================================================================");
+  var U=S.suelo;
+  kv("Folio del certificado",U.folio); kv("Fecha del certificado",U.fecha);
+  kv("Zonificación",U.clave); kv("Uso",U.uso);
+  kv("Niveles máximos",U.niveles); kv("Área libre exigida",U.areaLibre?U.areaLibre+"%":"");
+  kv("Densidad",U.densidad); kv("m² de terreno por vivienda",U.densidadM2);
+  kv("Norma de ordenación",U.norma);
+  if(U.pot.activo){
+    w("");
+    w("  POTENCIAL ADQUIRIDO — incluye una subsección en Uso de suelo.");
+    num("  Superficie adicional",n(U.pot.m2),"m²");
+    kv("  Instrumento",U.pot.instrumento||"PENDIENTE POR CONFIRMAR — no lo nombres en el documento");
+    kv("  Folio o certificado",U.pot.folio); kv("  Autoridad emisora",U.pot.autoridad);
+    kv("  Fecha",U.pot.fecha); kv("  Predio emisor",U.pot.emisor);
+    kv("  ¿Incrementa niveles?",U.pot.modNiveles?("Sí, "+(U.pot.nivelesExtra||"?")+" niveles"):"No");
+    kv("  ¿Modifica área libre?",U.pot.modAreaLibre?("Sí, "+(U.pot.areaLibreNueva||"?")+"%"):"No");
+    kv("  ¿Modifica densidad?",U.pot.modDensidad?("Sí, "+(U.pot.densidadNueva||"?")+" m²/viv"):"No");
+  }
+  w("");
+  w("=================================================================");
+  w("COEFICIENTES — YA CALCULADOS, ÚSALOS TAL CUAL");
+  w("=================================================================");
+  num("COS (área de desplante)",c.cos,"m²");
+  num("Área libre requerida",c.areaLibreReq,"m²");
+  num("Factor CUS",c.factorCUS,"");
+  num("Superficie máxima de construcción base",c.supMaxBase,"m²");
+  if(c.potM2) num("Más potencial adquirido",c.potM2,"m²");
+  num("SUPERFICIE MÁXIMA DE CONSTRUCCIÓN",c.supMaxTotal,"m²");
+  num("Desplante proyectado",c.desplante,"m²");
+  num("Porcentaje de desplante",c.pctDesplante,"%");
+  num("Área libre proyectada",c.areaLibreReal,"m²");
+  num("Porcentaje de área libre",c.pctAreaLibre,"%");
+  num("Superficie sobre nivel de banqueta",c.supSNB,"m²");
+  num("Superficie bajo nivel de banqueta",c.supBNB,"m²");
+  num("SUPERFICIE TOTAL DE CONSTRUCCIÓN",c.supTotal,"m²");
+  w("");
+  w("=================================================================");
+  w("B4 · NIVELES Y ALTURAS");
+  w("=================================================================");
+  kv("Nivel de banqueta",S.niveles.banqueta); kv("Pretil o remate",S.niveles.pretil);
+  S.niveles.lista.forEach(function(x){
+    w("  "+(x.nombre||"Nivel")+" — NPT "+(x.npt||"—")+" m"+
+      (x.entrepiso?" · entrepiso "+x.entrepiso+" m":"")+
+      (x.libre?" · libre "+x.libre+" m":"")+
+      " · habitable "+(x.hab||"0")+" m² · no habitable "+(x.noHab||"0")+" m²"+
+      (x.snb?" · sobre banqueta":" · bajo banqueta"));
+    if(x.usos) w("      Usos: "+x.usos);
+  });
+  w("");
+  w("=================================================================");
+  w("B5 · PROGRAMA DE VIVIENDA");
+  w("=================================================================");
+  var V=S.viv;
+  kv("Total de viviendas",V.total); kv("Recámaras por vivienda",V.recamaras);
+  kv("Superficie de vivienda",(V.supMin&&V.supMax)?(V.supMin+" a "+V.supMax+" m²"):"");
+  kv("Altura libre",V.alturaLibre?V.alturaLibre+" m":"");
+  kv("Ancho mínimo de recámaras",V.anchoRec?V.anchoRec+" m":"");
+  kv("Ancho mínimo de otros habitables",V.anchoOtros?V.anchoOtros+" m":"");
+  kv("Ancho mínimo de estancia-comedor",V.anchoEstancia?V.anchoEstancia+" m":"");
+  kv("Locales de la vivienda",V.locales); kv("Prototipos",V.prototipos);
+  V.porNivel.forEach(function(x){ if(x.nivel||x.cant) w("  "+(x.nivel||"—")+": "+(x.cant||"—")+" viviendas"); });
+  w("");
+  w("=================================================================");
+  w("B6 · PATIOS");
+  w("=================================================================");
+  num("Altura de paramento",c.alturaParamento,"m");
+  num("Lado mínimo del patio",c.ladoMin,"m");
+  num("Lado mínimo con reducción de 1/5",c.ladoReducido,"m");
+  num("Dimensión ortogonal exigida para la reducción",c.ortogonalReq,"m");
+  c.patios.forEach(function(p){
+    w("  "+p.nombre+" ×"+p.cant+" — "+fmt(p.corto)+" × "+fmt(p.largo)+" m"+
+      (p.sup?" = "+fmt(p.sup)+" m²":""));
+  });
+  if(S.patios.cubierta) kv("Cubierta de patios",(S.patios.tipoCubierta||"")+(S.patios.alturaCubierta?", elevada "+S.patios.alturaCubierta+" m sobre pretiles":""));
+  w("");
+  w("=================================================================");
+  w("B7 · ESTACIONAMIENTO");
+  w("=================================================================");
+  num("Cajones máximos permitidos",c.cajMax,"",0);
+  S.estac.niveles.forEach(function(x){
+    w("  "+(x.nivel||"Nivel")+": "+((n(x.grandes)||0)+(n(x.chicos)||0))+" cajones · "+
+      (x.grandes||0)+" grandes ("+(x.dimG||"—")+") · "+(x.chicos||0)+" chicos ("+(x.dimC||"—")+")");
+  });
+  num("TOTAL DE CAJONES",c.cajTotal,"",0);
+  num("Cajones grandes",c.pctGrandes,"%",2);
+  num("Cajones chicos",c.pctChicos,"%",2);
+  num("Proporción respecto al máximo permitido",c.ratioCajones,"",2);
+  kv("Cajones para personas con discapacidad",S.estac.pcdCant?S.estac.pcdCant+" de "+(S.estac.pcdDim||"—"):"");
+  kv("Ángulo del cajón",S.estac.angulo); kv("Ancho de pasillo",S.estac.pasillo?S.estac.pasillo+" m":"");
+  kv("Accesos vehiculares",S.estac.accesos);
+  S.estac.rampas.forEach(function(r,i){
+    w("  Rampa "+(i+1)+(r.nivel?" a "+r.nivel:"")+": "+(r.long||"—")+" m de longitud, "+
+      (r.ancho||"—")+" m de ancho"+(r.guarnicion?" más guarniciones de "+r.guarnicion:"")+
+      ", pendiente "+(r.pend||"—")+"%");
+  });
+  w("");
+  w("=================================================================");
+  w("B8 · CIRCULACIÓN VERTICAL");
+  w("=================================================================");
+  var E=S.elev;
+  kv("Núcleos verticales",E.nucleos);
+  kv("ELEVADORES DEL PROYECTO",E.cantidad);
+  kv("Escaleras",E.escaleras); kv("Niveles servidos",E.nivelesServidos);
+  num("Población de cálculo",c.poblacion,"habitantes",0);
+  num("Población a movilizar en 5 min",c.movilizar,"personas",0);
+  kv("Capacidad por cabina",E.capCabina?E.capCabina+" personas":"");
+  kv("Tiempo de ciclo",E.rtt?E.rtt+" s":""); kv("Intervalo máximo de espera",E.intervalo?E.intervalo+" s":"");
+  num("Capacidad por elevador en 5 min",c.capElev,"personas",1);
+  num("Elevadores mínimos por cálculo",c.elevMin,"",0);
+  w("  Usa un solo número de elevadores en todo el documento: el de arriba.");
+  w("");
+  w("=================================================================");
+  w("B9 · ÁREAS COMUNES Y SERVICIOS");
+  w("=================================================================");
+  var K=S.comunes;
+  kv("Control de acceso",K.control); kv("Amenidades",K.amenidades); kv("Servicios",K.servicios);
+  kv("Áreas técnicas",K.tecnicas); kv("Bodegas",K.bodegas);
+  kv("Cuarto de basura",K.basura); kv("Biciestacionamientos",K.bici);
+  w("");
+  w("=================================================================");
+  w("GRÁFICOS — te los subo por separado");
+  w("=================================================================");
+  S.graficos.forEach(function(g){
+    if(g.estado==="No aplica") return;
+    w("  ["+(g.estado==="Listo"?"adjunto":"pendiente")+"] "+g.nombre+" → "+g.seccion+
+      (g.pie?" · pie: "+g.pie:""));
+  });
+  w("");
+  w("=================================================================");
+  w("PENDIENTES POR CONFIRMAR — recuérdamelos si te pregunto");
+  w("=================================================================");
+  var pend=[];
+  if(S.predio.fusion && !S.predio.docFusion.tipo) pend.push("Nombre exacto del documento que avala la fusión de predios");
+  if(S.suelo.pot.activo && !S.suelo.pot.instrumento) pend.push("Instrumento normativo del potencial adquirido");
+  if(!S.suelo.densidadM2) pend.push("m² de terreno por vivienda que aplican a este predio");
+  pend.push("Verificar artículos, incisos y mínimos dimensionales contra la NTC-Proyecto Arquitectónico vigente (edición de diciembre de 2024)");
+  if(S.pendientes) pend.push(S.pendientes);
+  pend.forEach(function(p,i){ w("  "+(i+1)+". "+p); });
+  var nr=A.filter(function(x){return x.l==="r"}).length;
+  if(nr){
+    w("");
+    w("  Nota interna: el tablero marca "+nr+" punto"+(nr>1?"s":"")+" en rojo.");
+    w("  Genera el documento igual. No los menciones en el texto.");
+  }
+  w("");
+  w("=================================================================");
+  w("FIN DE LA FICHA");
+  w("=================================================================");
+  return L.join("\n");
+}
+
+function vFicha(){
+  var t=ficha();
+  var h='<h2>Ficha de salida</h2><p class="sub">Cópiala, abre un chat nuevo en el proyecto «Arquitectura consulta», pégala y sube los gráficos.</p>';
+  h+='<div class="note">La ficha ya trae las instrucciones de redacción, los cálculos resueltos y la lista de gráficos con su sección destino. No necesitas explicar nada más.</div>';
+  h+='<textarea class="ficha" id="fich" readonly>'+esc(t)+'</textarea>';
+  h+='<div class="btnrow"><button class="btn pri" id="bcopy">Copiar ficha</button>'+
+     '<button class="btn" id="bsel">Seleccionar todo</button></div>';
+  h+=COTA("Nota para ti")+
+     '<div class="f">'+F("pendientes","Pendientes propios de este proyecto",{wide:true,type:"area",
+       ph:"Lo que escribas aquí se imprime al final de la ficha"})+'</div>';
+  setTimeout(function(){
+    var ta=document.getElementById("fich");
+    document.getElementById("bsel").onclick=function(){ ta.focus(); ta.select(); };
+    document.getElementById("bcopy").onclick=async function(){
+      try{ await navigator.clipboard.writeText(ta.value); toast("Ficha copiada"); }
+      catch(e){ ta.focus(); ta.select(); toast("Pulsa Ctrl+C o Cmd+C para copiar"); }
+    };
+  },0);
+  return h;
+}
+
+/* ============================================================
+   ARRANQUE
+   ============================================================ */
+(async function(){
+  await cargarIndice();
+  render();
+  setInterval(function(){ if(S && DIRTY) guardar(true); }, 15000);
+})();
+
+})();
+</script>
