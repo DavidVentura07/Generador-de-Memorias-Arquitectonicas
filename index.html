@@ -173,7 +173,7 @@
   <div class="hd">
     <div>
       <h1>Captura de variables</h1>
-      <p>Memoria descriptiva · Vivienda plurifamiliar CDMX · v2</p>
+      <p id="ver">Memoria descriptiva · Vivienda plurifamiliar CDMX</p>
     </div>
     <div class="chip" id="chip">Sin proyecto abierto</div>
   </div>
@@ -194,6 +194,15 @@
 "use strict";
 
 var S = null, IDX = [], VIEW = "proy", DIRTY = false;
+
+/* Versión visible en el encabezado y en la sección Respaldo.
+   Al publicar cualquier cambio hay que subirla AQUÍ, en un solo lugar: es lo
+   único que permite saber de un vistazo si el navegador está sirviendo una
+   copia vieja de su caché en lugar de la recién publicada.                   */
+var VERSION = "2.2";
+var VERSION_FECHA = "12 ago 2026";
+
+var BORRAR_ID = null;   /* proyecto con la eliminación pendiente de confirmar */
 
 function nuevoProyecto(nombre){
   return {
@@ -346,7 +355,7 @@ async function borrar(id){
 
 /* ================= RESPALDO ================= */
 async function exportarTodo(){
-  var out = {formato:"memoria-descriptiva-cdmx", version:2,
+  var out = {formato:"memoria-descriptiva-cdmx", version:2, app:VERSION,
     generado:new Date().toISOString(), proyectos:[]};
   for(var i=0;i<IDX.length;i++){
     try{
@@ -357,7 +366,7 @@ async function exportarTodo(){
   return JSON.stringify(out, null, 2);
 }
 function exportarUno(){
-  return JSON.stringify({formato:"memoria-descriptiva-cdmx", version:2,
+  return JSON.stringify({formato:"memoria-descriptiva-cdmx", version:2, app:VERSION,
     generado:new Date().toISOString(), proyectos:[S]}, null, 2);
 }
 async function importar(texto){
@@ -619,7 +628,7 @@ function pintarRail(){
   });
   r.innerHTML=h;
   r.querySelectorAll("button").forEach(function(b){
-    b.onclick=function(){ if(b.disabled) return; VIEW=b.dataset.v; render(); };
+    b.onclick=function(){ if(b.disabled) return; BORRAR_ID=null; VIEW=b.dataset.v; render(); };
   });
 }
 function pintarChip(){
@@ -715,10 +724,17 @@ function vProyectos(){
   if(!IDX.length) h+='<div class="empty">No hay proyectos todavía. Crea el primero para empezar a capturar.</div>';
   else IDX.forEach(function(p){
     var f=new Date(p.actualizado);
+    /* Eliminar pide confirmación en el propio renglón. Sin confirm() del
+       navegador: bloquea la página y no siempre está disponible.            */
+    var acc = (BORRAR_ID===p.id)
+      ? '<span style="font-size:11.5px;color:var(--r);align-self:center;text-align:right">Se elimina<br>sin vuelta atrás</span>'+
+        '<button class="btn sm dgr" data-si="'+p.id+'">Sí, eliminar</button>'+
+        '<button class="btn sm" data-no="1">Conservar</button>'
+      : '<button class="btn sm" data-open="'+p.id+'">Abrir</button>'+
+        '<button class="btn sm dgr" data-rm="'+p.id+'">Eliminar</button>';
     h+='<div class="pitem'+(S&&S.id===p.id?" on":"")+'"><div><b>'+esc(p.nombre)+'</b>'+
        '<small>'+f.toLocaleDateString("es-MX")+" · "+f.toLocaleTimeString("es-MX",{hour:"2-digit",minute:"2-digit"})+'</small></div>'+
-       '<div style="display:flex;gap:6px"><button class="btn sm" data-open="'+p.id+'">Abrir</button>'+
-       '<button class="btn sm dgr" data-rm="'+p.id+'">Eliminar</button></div></div>';
+       '<div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;align-items:center">'+acc+'</div></div>';
   });
   if(S) h+=COTA("Proyecto abierto")+'<div class="grid">'+F("nombre","Nombre del proyecto",{wide:true,hint:"Solo para localizarlo en esta lista"})+'</div>';
   setTimeout(function(){
@@ -733,8 +749,10 @@ function vProyectos(){
       copia.id="p"+Date.now(); copia.nombre=S.nombre+" (copia)";
       S=copia; await guardar(true); render(); toast("Proyecto duplicado");
     };
-    document.querySelectorAll("[data-open]").forEach(function(b){ b.onclick=function(){ abrir(b.dataset.open); }; });
-    document.querySelectorAll("[data-rm]").forEach(function(b){ b.onclick=function(){ borrar(b.dataset.rm); }; });
+    document.querySelectorAll("[data-open]").forEach(function(b){ b.onclick=function(){ BORRAR_ID=null; abrir(b.dataset.open); }; });
+    document.querySelectorAll("[data-rm]").forEach(function(b){ b.onclick=function(){ BORRAR_ID=b.dataset.rm; render(); }; });
+    document.querySelectorAll("[data-si]").forEach(function(b){ b.onclick=function(){ var id=b.dataset.si; BORRAR_ID=null; borrar(id); }; });
+    document.querySelectorAll("[data-no]").forEach(function(b){ b.onclick=function(){ BORRAR_ID=null; render(); }; });
   },0);
   return h;
 }
@@ -1240,15 +1258,20 @@ function vRespaldo(){
      '<button class="btn" id="bver">Ver el JSON</button></div>';
   h+='<textarea class="ficha" id="jsonbox" style="height:200px;display:none" readonly></textarea>';
   h+='<div class="btnrow" id="copyrow" style="display:none"><button class="btn" id="bcopyj">Copiar JSON</button></div>';
-  h+=COTA("Restaurar");
-  h+='<div class="note warn">Restaurar nunca borra nada. Si un proyecto ya existe, se añade como copia con el sufijo «(importado)».</div>';
-  h+='<div class="btnrow"><label class="btn" style="cursor:pointer">Elegir archivo de respaldo'+
+  h+=COTA("Importar");
+  h+='<div class="btnrow"><label class="btn pri" style="cursor:pointer">Importar respaldo (.json)'+
      '<input type="file" id="fimp" accept=".json,application/json" style="display:none"></label></div>';
+  h+='<div class="note warn">Importar nunca borra nada: los proyectos que ya tengas se quedan donde están. '+
+     'Si el que entra tiene el mismo identificador que uno existente, se añade como copia con el sufijo «(importado)», '+
+     'de modo que puedes comparar los dos y quedarte con el bueno.</div>';
   h+='<div class="f" style="margin-top:14px"><label>O pega aquí el contenido del respaldo</label>'+
-     '<textarea id="impbox" class="ficha" style="height:140px" placeholder="{ &quot;formato&quot;: &quot;memoria-descriptiva-cdmx&quot;, ... }"></textarea></div>';
-  h+='<div class="btnrow"><button class="btn pri" id="bimp">Restaurar desde el texto pegado</button></div>';
+     '<textarea id="impbox" class="ficha" style="height:140px" placeholder="{ &quot;formato&quot;: &quot;memoria-descriptiva-cdmx&quot;, ... }"></textarea>'+
+     '<div class="hint">Solo hace falta si el navegador no te deja abrir el archivo.</div></div>';
+  h+='<div class="btnrow"><button class="btn" id="bimp">Importar desde el texto pegado</button></div>';
   h+=COTA("Estado");
   h+='<table class="calc"><tr><th>Concepto</th><th style="text-align:right">Valor</th></tr>'+
+     '<tr><td>Versión de la aplicación</td><td class="n">'+VERSION+' · '+VERSION_FECHA+'</td></tr>'+
+     '<tr><td>Dónde se guardan los datos</td><td class="n">'+(SIN_ALMACEN?"en ningún sitio":"este navegador")+'</td></tr>'+
      '<tr><td>Proyectos guardados</td><td class="n">'+IDX.length+'</td></tr>'+
      '<tr><td>Proyecto abierto</td><td class="n">'+(S?esc(S.nombre):"—")+'</td></tr>'+
      '<tr><td>Cambios sin guardar</td><td class="n">'+(DIRTY?"sí":"no")+'</td></tr></table>';
@@ -1292,6 +1315,7 @@ function vRespaldo(){
     fi.onchange=function(){
       var f=fi.files && fi.files[0];
       if(!f) return;
+      fi.value="";   /* si no se limpia, elegir el mismo archivo dos veces no dispara nada */
       var rd=new FileReader();
       rd.onload=function(){ restaurar(String(rd.result)); };
       rd.onerror=function(){ toast("No se pudo leer el archivo. Ábrelo y pega el contenido abajo"); };
@@ -1303,6 +1327,18 @@ function vRespaldo(){
 
 /* ================= ARRANQUE ================= */
 (async function(){
+  document.getElementById("ver").textContent =
+    "Memoria descriptiva · Vivienda plurifamiliar CDMX · v"+VERSION+" · "+VERSION_FECHA;
+
+  /* Red de seguridad para la ventana de 15 s que deja el autoguardado: si se
+     cierra la pestaña con cambios sin guardar, el navegador pide confirmación.
+     El texto lo pone el navegador; aquí solo se declara que hay algo que perder. */
+  window.addEventListener("beforeunload", function(e){
+    if(!S || !DIRTY) return;
+    e.preventDefault();
+    e.returnValue = "";
+  });
+
   await cargarIndice();
   render();
   if(SIN_ALMACEN){
