@@ -1,4 +1,16 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Captura de variables · Memoria descriptiva CDMX</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%232F7D6B'/><text x='16' y='23' font-family='Georgia,serif' font-size='19' fill='%23ffffff' text-anchor='middle'>M</text></svg>">
+</head>
+<body>
+
 <style>
+  html,body{margin:0;padding:0;background:#F3F6F4}
   .mdapp{
     --pap:#F3F6F4;
     --sup:#FFFFFF;
@@ -166,6 +178,8 @@
     <div class="chip" id="chip">Sin proyecto abierto</div>
   </div>
 
+  <div id="aviso"></div>
+
   <div class="shell">
     <nav class="rail" id="rail"></nav>
     <main class="pane" id="pane"></main>
@@ -231,27 +245,82 @@ function graficosIniciales(){
   });
 }
 
-/* ================= ALMACENAMIENTO ================= */
+/* ================= ALMACENAMIENTO =================
+   Dentro de un artifact de Claude existe window.storage. Fuera de él
+   (GitHub Pages o archivo local) no existe, y se usa localStorage con la
+   misma interfaz asíncrona. Las claves son idénticas en los dos casos, así
+   que un respaldo exportado en un entorno se restaura en el otro.          */
+var SIN_ALMACEN = false;
+var storage = (function(){
+  if(window.storage && typeof window.storage.get === "function") return window.storage;
+  var ls = null;
+  try{
+    ls = window.localStorage;
+    ls.setItem("mem:sonda","1"); ls.removeItem("mem:sonda");
+  }catch(e){ ls = null; }
+  if(!ls){
+    SIN_ALMACEN = true;
+    var no = function(){ return Promise.reject(new Error("almacenamiento bloqueado")); };
+    return {get:no, set:no, delete:no, list:no};
+  }
+  /* Todas las páginas publicadas bajo el mismo usuario de GitHub Pages comparten
+     el origen <usuario>.github.io y, con él, un solo localStorage: la carpeta del
+     repositorio no aísla nada. El prefijo mantiene estos datos separados de los de
+     cualquier otra aplicación publicada en el mismo dominio.                      */
+  var PFX = "memdesc:";
+  try{
+    if(ls.getItem("mem:index")!==null && ls.getItem(PFX+"mem:index")===null){
+      var viejas=[];
+      for(var j=0;j<ls.length;j++){ var k=ls.key(j); if(k && k.indexOf("mem:")===0) viejas.push(k); }
+      viejas.forEach(function(k){ ls.setItem(PFX+k, ls.getItem(k)); ls.removeItem(k); });
+    }
+  }catch(e){}
+  return {
+    get: function(k){
+      var v = ls.getItem(PFX+k);
+      return v===null ? Promise.reject(new Error("no encontrado")) : Promise.resolve({value:v});
+    },
+    set: function(k,v){
+      try{ ls.setItem(PFX+k,v); }catch(e){ return Promise.reject(e); }
+      return Promise.resolve({});
+    },
+    delete: function(k){ ls.removeItem(PFX+k); return Promise.resolve({}); },
+    list: function(){
+      var ks=[];
+      for(var i=0;i<ls.length;i++){
+        var k=ls.key(i);
+        if(k && k.indexOf(PFX)===0) ks.push(k.slice(PFX.length));
+      }
+      return Promise.resolve({keys:ks});
+    }
+  };
+})();
+function fallaGuardado(e){
+  if(SIN_ALMACEN) return "Este navegador tiene bloqueado el almacenamiento. Sal del modo incógnito o permite los datos de sitio";
+  if(e && (e.name==="QuotaExceededError" || e.code===22 || e.code===1014))
+    return "Se llenó el espacio del navegador. Descarga un respaldo y elimina proyectos que ya no uses";
+  return "No se pudo guardar. Inténtalo otra vez";
+}
 async function cargarIndice(){
-  try{ var r = await window.storage.get("mem:index"); IDX = r && r.value ? JSON.parse(r.value) : []; }
+  try{ var r = await storage.get("mem:index"); IDX = r && r.value ? JSON.parse(r.value) : []; }
   catch(e){ IDX = []; }
 }
 async function guardarIndice(){
-  try{ await window.storage.set("mem:index", JSON.stringify(IDX)); }
-  catch(e){ toast("No se pudo guardar el índice de proyectos"); }
+  try{ await storage.set("mem:index", JSON.stringify(IDX)); }
+  catch(e){ toast(fallaGuardado(e)); }
 }
 async function guardar(silencio){
   if(!S) return;
   S.actualizado = new Date().toISOString();
   try{
-    await window.storage.set("mem:proj:"+S.id, JSON.stringify(S));
+    await storage.set("mem:proj:"+S.id, JSON.stringify(S));
     var i = IDX.findIndex(function(x){return x.id===S.id});
     var meta = {id:S.id, nombre:S.nombre, actualizado:S.actualizado};
     if(i>=0) IDX[i]=meta; else IDX.unshift(meta);
     await guardarIndice(); DIRTY=false;
     if(!silencio) toast("Proyecto guardado");
     pintarChip();
-  }catch(e){ toast("No se pudo guardar. Inténtalo otra vez"); }
+  }catch(e){ toast(fallaGuardado(e)); }
 }
 function migrar(p){
   var base = nuevoProyecto();
@@ -261,13 +330,13 @@ function migrar(p){
 }
 async function abrir(id){
   try{
-    var r = await window.storage.get("mem:proj:"+id);
+    var r = await storage.get("mem:proj:"+id);
     S = migrar(JSON.parse(r.value)); VIEW="ident"; render();
   }catch(e){ toast("No se pudo abrir el proyecto"); }
 }
 async function borrar(id){
   try{
-    await window.storage.delete("mem:proj:"+id);
+    await storage.delete("mem:proj:"+id);
     IDX = IDX.filter(function(x){return x.id!==id});
     await guardarIndice();
     if(S && S.id===id){ S=null; VIEW="proy"; }
@@ -281,7 +350,7 @@ async function exportarTodo(){
     generado:new Date().toISOString(), proyectos:[]};
   for(var i=0;i<IDX.length;i++){
     try{
-      var r = await window.storage.get("mem:proj:"+IDX[i].id);
+      var r = await storage.get("mem:proj:"+IDX[i].id);
       if(r && r.value) out.proyectos.push(JSON.parse(r.value));
     }catch(e){}
   }
@@ -304,7 +373,7 @@ async function importar(texto){
       p.id = "p"+Date.now()+"-"+i; p.nombre = p.nombre + " (importado)"; copias++;
     } else nuevos++;
     p.actualizado = p.actualizado || new Date().toISOString();
-    await window.storage.set("mem:proj:"+p.id, JSON.stringify(p));
+    await storage.set("mem:proj:"+p.id, JSON.stringify(p));
     IDX.unshift({id:p.id, nombre:p.nombre, actualizado:p.actualizado});
   }
   await guardarIndice();
@@ -1162,7 +1231,9 @@ function vFicha(){
 /* ================= RESPALDO ================= */
 function vRespaldo(){
   var h='<h2>Respaldo</h2><p class="sub">Descarga una copia de todos tus proyectos, o restaura desde un respaldo anterior.</p>';
-  h+='<div class="note">Los datos viven dentro de este artefacto. Descarga un respaldo cada vez que termines una sesión de captura: es la única copia que queda fuera.</div>';
+  h+='<div class="note">Los datos viven en este navegador y en este equipo: no viajan a ningún servidor. '+
+     'Si borras los datos de navegación, cambias de computadora o abres la página en otro navegador, no estarán. '+
+     'Descarga un respaldo cada vez que termines una sesión de captura: es la única copia que queda fuera.</div>';
   h+=COTA("Descargar");
   h+='<div class="btnrow"><button class="btn pri" id="bexp">Descargar todos los proyectos</button>'+
      (S?'<button class="btn" id="bexp1">Descargar solo «'+esc(S.nombre)+'»</button>':'')+
@@ -1234,8 +1305,18 @@ function vRespaldo(){
 (async function(){
   await cargarIndice();
   render();
+  if(SIN_ALMACEN){
+    document.getElementById("aviso").innerHTML =
+      '<div class="note dgr" style="margin:0 26px">Este navegador tiene bloqueado el almacenamiento local. '+
+      'Puedes capturar y generar la ficha, pero <b>nada quedará guardado</b> al cerrar la pestaña. '+
+      'Sal del modo incógnito, o descarga un respaldo desde la sección Respaldo antes de salir.</div>';
+    return;   /* sin autoguardado: solo repetiría el mismo error cada 15 s */
+  }
   setInterval(function(){ if(S && DIRTY) guardar(true); }, 15000);
 })();
 
 })();
 </script>
+
+</body>
+</html>
