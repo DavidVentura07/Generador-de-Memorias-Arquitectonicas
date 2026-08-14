@@ -234,7 +234,7 @@ var S = null, IDX = [], VIEW = "proy", DIRTY = false;
    Al publicar cualquier cambio hay que subirla AQUÍ, en un solo lugar: es lo
    único que permite saber de un vistazo si el navegador está sirviendo una
    copia vieja de su caché en lugar de la recién publicada.                   */
-var VERSION = "2.4";
+var VERSION = "2.5";
 var VERSION_FECHA = "14 ago 2026";
 
 var BORRAR_ID = null;     /* proyecto con la eliminación pendiente de confirmar */
@@ -255,6 +255,8 @@ function nuevoProyecto(nombre){
       pot:{activo:false, instrumento:"", folio:"", autoridad:"", fecha:"", m2:"", emisor:"",
         modNiveles:false, nivelesExtra:"", modAreaLibre:false, areaLibreNueva:"", modDensidad:false, densidadNueva:""}},
     niveles:{banqueta:"0.00", pretil:"", lista:[]},
+    /* texto propio por nivel: si está vacío, el documento arma el párrafo
+       con los usos capturados; si lleva algo, manda el del usuario (§17.5) */
     viv:{total:"", porNivel:[], protos:[], supMin:"", supMax:"", prototipos:"", locales:"", recamaras:"",
       alturaLibre:"", anchoRec:"", anchoOtros:"", anchoEstancia:""},
     patios:{nptHab:"", nivelParamento:"", cubierta:false, tipoCubierta:"", alturaCubierta:"", lista:[]},
@@ -1499,7 +1501,11 @@ function vNiveles(){
       F("niveles.lista."+i+".hab","Superficie habitable (m²)",{type:"num"})+
       F("niveles.lista."+i+".noHab","Superficie no habitable (m²)",{type:"num"})+
       CHIPS("niveles.lista."+i+".usos","Usos que contiene",
-        {opts:LISTAS.usosNivel,cat:"usosNivel"})+'</div>'+
+        {opts:LISTAS.usosNivel,cat:"usosNivel",
+         hint:"Puedes escribir la cantidad: «30 cajones de estacionamiento», «11 bodegas»"})+
+      F("niveles.lista."+i+".texto","Texto propio de este nivel",
+        {wide:true,type:"area",
+         hint:"Si lo dejas vacío, el documento arma la frase con los usos de arriba. Si escribes aquí, manda lo tuyo."})+'</div>'+
       SW("niveles.lista."+i+".snb","Sobre nivel de banqueta","Solo lo que está sobre banqueta computa para el CUS",true)+
       SW("niveles.lista."+i+".cuenta","Cuenta como nivel para la altura","",true)+
       SW("niveles.lista."+i+".desplante","Forma el área de desplante","Normalmente solo la planta baja",true)+
@@ -1634,15 +1640,17 @@ function vDocumento(){
      '<tr><td>Carátula, con propietario, proyectista, DRO y fecha</td><td>Completa</td></tr>'+
      '<tr><td>1.4 Coeficiente de ocupación del suelo</td><td>Texto y tabla</td></tr>'+
      '<tr><td>1.5 Coeficiente de utilización del suelo</td><td>Texto y tablas</td></tr>'+
-     '<tr><td>2.7 Alturas</td><td>Tabla</td></tr>'+
-     '<tr><td>2.8 Patios</td><td>Tabla</td></tr>'+
-     '<tr><td>2.10 Estacionamiento</td><td>Tabla</td></tr>'+
-     '<tr><td>2.11 Circulación vertical</td><td>Tabla</td></tr>'+
+     '<tr><td>Recorrido por niveles, un apartado por nivel</td><td>Texto</td></tr>'+
+     '<tr><td>Alturas</td><td>Tabla</td></tr>'+
+     '<tr><td>Patios</td><td>Tabla</td></tr>'+
+     '<tr><td>Estacionamiento</td><td>Tabla</td></tr>'+
+     '<tr><td>Circulación vertical</td><td>Tabla</td></tr>'+
      '<tr><td>Gráficos, en su marco punteado</td><td>'+conImg+' con imagen'+
        (pend?' · '+pend+' como marcador':'')+'</td></tr>'+
      '</table>';
 
-  h+='<div class="note warn">Las secciones descriptivas —antecedentes, recorrido por niveles, áreas comunes, conclusión— <b>todavía no se redactan solas</b>. Están en la lista de trabajo y hay que repasarlas contigo, frase por frase. Mientras tanto, para esas partes sigue sirviendo la ficha de salida y el chat.</div>';
+  h+='<div class="note warn">Faltan por redactar: los antecedentes de propiedad y fusión, el uso de suelo, la descripción general, el programa de vivienda, las áreas comunes y la conclusión. Para esas partes sigue sirviendo la ficha de salida y el chat.</div>';
+  h+='<div class="note">El recorrido por niveles se arma con lo que capturaste en <b>Niveles y alturas</b>: el primer párrafo con las cifras, el segundo con los usos. Los niveles seguidos de planta idéntica se describen juntos. Si alguno necesita otra redacción, escríbela en su campo «Texto propio» y esa manda.</div>';
 
   if(pend)
     h+='<div class="note">'+pend+' gráfico'+(pend===1?'':'s')+' saldrá'+(pend===1?'':'n')+
@@ -2134,6 +2142,82 @@ function col(w,al){ return {w:w, al:al||"left"}; }
 function m2(v){ return v===null||v===undefined||isNaN(v) ? "—" : fmt(v); }
 function pct(v){ return v===null||v===undefined||isNaN(v) ? "—" : fmt(v)+" %"; }
 
+function normaliza(s){
+  return String(s||"").toLowerCase()
+    .replace(/[áàä]/g,"a").replace(/[éèë]/g,"e").replace(/[íìï]/g,"i")
+    .replace(/[óòö]/g,"o").replace(/[úùü]/g,"u").replace(/ñ/g,"n");
+}
+/* Los NPT se escriben con signo, como en el documento de David: +1.80, -4.20. */
+function npt(v){
+  var x=n(v); if(x===null) return "—";
+  return (x>=0?"+":"")+fmt(x);
+}
+/* Busca la palabra completa, no el trozo: «sótano» NO puede casar dentro de
+   «semisótano», o la planta del semisótano acaba ilustrando el sótano.    */
+function contienePalabra(texto, palabra){
+  if(!palabra) return false;
+  var i = texto.indexOf(palabra);
+  while(i >= 0){
+    var antes = i===0 ? "" : texto.charAt(i-1);
+    var despues = texto.charAt(i+palabra.length);
+    if(!/[a-z0-9]/.test(antes) && !/[a-z0-9]/.test(despues)) return true;
+    i = texto.indexOf(palabra, i+1);
+  }
+  return false;
+}
+/* En prosa los números pequeños van con letra: «los cinco niveles». */
+var NUMERO_LETRA=["cero","uno","dos","tres","cuatro","cinco","seis","siete","ocho",
+  "nueve","diez","once","doce","trece","catorce","quince","dieciséis","diecisiete",
+  "dieciocho","diecinueve","veinte"];
+function enLetra(x){
+  var v=n(x);
+  return (v!==null && v>=0 && v<=20 && v===Math.round(v)) ? NUMERO_LETRA[v] : String(x);
+}
+/* «Nivel» → «Niveles», «Planta» → «Plantas». */
+function plural(p){
+  if(/[aeiouáéíóú]$/i.test(p)) return p+"s";
+  if(/z$/i.test(p)) return p.slice(0,-1)+"ces";
+  return p+"es";
+}
+/* «A, B y C» — una lista en castellano, no separada por comas hasta el final. */
+function enumerar(lista){
+  var L=lista.filter(function(x){ return String(x||"").trim()!==""; });
+  if(!L.length) return "";
+  if(L.length===1) return L[0];
+  return L.slice(0,-1).join(", ")+" y "+L[L.length-1];
+}
+/* El artículo depende del nombre del nivel: «el sótano», «la planta baja». */
+var NIVEL_FEMENINO=/^(planta|azotea|terraza|cubierta|entreplanta)/i;
+function elNivel(nombre, mayus){
+  var art = NIVEL_FEMENINO.test(String(nombre||"").trim()) ? "la" : "el";
+  if(mayus) art = art.charAt(0).toUpperCase()+art.slice(1);
+  return art+" "+String(nombre||"nivel").toLowerCase();
+}
+/* Niveles consecutivos de planta idéntica se describen juntos, como hace
+   David con los cinco niveles tipo: una sola sección en vez de cinco
+   iguales. La comparación es sobre lo que define la planta.               */
+/* «Nivel 1» … «Nivel 5» → «Niveles 1 a 5». Si los nombres no comparten
+   raíz, se enumeran tal cual: «Sótano a Azotea» sería peor que la verdad. */
+function tituloGrupo(nombres){
+  if(nombres.length===1) return nombres[0];
+  var m0=String(nombres[0]).match(/^(.*?)\s*(\d+)$/);
+  var mn=String(nombres[nombres.length-1]).match(/^(.*?)\s*(\d+)$/);
+  if(m0 && mn && m0[1] && m0[1]===mn[1])
+    return plural(m0[1].trim())+" "+m0[2]+" a "+mn[2];
+  return nombres[0]+" a "+nombres[nombres.length-1];
+}
+function agruparNiveles(L){
+  var g=[], act=null;
+  function firma(x){
+    return [x.hab,x.noHab,x.entrepiso,x.libre,x.usos,x.texto,!!x.snb].join("|");
+  }
+  L.forEach(function(x){
+    if(act && firma(act[0])===firma(x)) act.push(x);
+    else { act=[x]; g.push(act); }
+  });
+  return g;
+}
+
 function bloquesDocumento(){
   var c=calc(), B=[], I=S.ident, U=S.suelo;
   function vacio(n){ for(var i=0;i<(n||1);i++) B.push({t:"vacio"}); }
@@ -2143,15 +2227,24 @@ function bloquesDocumento(){
     if(!filas.length) return;
     B.push({t:"tabla", cols:cols, enc:enc, filas:filas, op:op});
   }
-  /* Los gráficos se colocan detrás de la sección cuyo número comparten. */
-  function graficos(prefijo){
+  /* Los gráficos se emparejan por palabra, no por número de apartado: la
+     numeración del documento se calcula sola y cambia al añadir un nivel,
+     así que atarlos a un «2.5» los dejaría colgados a la primera.        */
+  var puestos = {};
+  function graficos(palabras, porNombre){
     S.graficos.forEach(function(g){
-      if(g.estado==="No aplica") return;
-      if(String(g.seccion||"").indexOf(prefijo)!==0) return;
+      if(g.estado==="No aplica" || puestos[g.gid]) return;
+      var donde = normaliza((porNombre?g.nombre:g.seccion)||"");
+      var toca = palabras.some(function(p){ return contienePalabra(donde, normaliza(p)); });
+      if(!toca) return;
+      puestos[g.gid]=true;
       B.push({t:"grafico", nombre:g.nombre||"Gráfico", pie:g.pie||null,
               gid:g.gid, imagen:null});
     });
   }
+  /* Numeración del capítulo 2: secuencial, en el orden en que se emiten. */
+  var cap2 = 0;
+  function seccion2(txt){ cap2++; titulo(2, "2."+cap2+" "+txt); }
 
   /* ---------------------------------------------------------- portada -- */
   vacio(9);
@@ -2195,7 +2288,7 @@ function bloquesDocumento(){
       pct(c.pctDesplante)+" de la superficie del predio, con lo que el área libre "+
       "resultante es de "+m2(c.areaLibreReal)+" m², equivalentes al "+
       pct(c.pctAreaLibre)+".");
-  graficos("1.4");
+  graficos(["COS","ocupación del suelo"]);
 
   /* ------------------------------------------------------------ 1.5 CUS -- */
   titulo(2,"1.5 Coeficiente de Utilización del Suelo (CUS)");
@@ -2244,23 +2337,85 @@ function bloquesDocumento(){
       m2(c.supBNB)+" m². La superficie total de construcción del proyecto es de "+
       m2(c.supTotal)+" m².");
   }
-  graficos("1.5");
+  graficos(["CUS","utilización del suelo","superficies por nivel","niveles y superficies"]);
+
+  /* ------------------------------------------- 2.x recorrido por niveles --
+     Un apartado por nivel, de abajo hacia arriba. Los niveles consecutivos
+     de planta idéntica van juntos, como los cinco niveles tipo del Moras.
+     El primer párrafo es pura cifra y sale de la captura; el segundo dice
+     qué aloja, y ahí manda el texto propio del nivel si lo hay.          */
+  if(L.length){
+    B.push({t:"titulo", nivel:1, txt:"2. Descripción del proyecto arquitectónico"});
+    agruparNiveles(L).forEach(function(grupo){
+      var x = grupo[0], varios = grupo.length>1;
+      var hab=n(x.hab), no=n(x.noHab), total=(hab||0)+(no||0);
+      var nombres = grupo.map(function(y){ return y.nombre||"Nivel"; });
+      seccion2(tituloGrupo(nombres));
+
+      /* --- párrafo 1: la ficha física --- */
+      var alturas=[];
+      if(n(x.entrepiso)!==null) alturas.push("altura de entrepiso de "+fmt(n(x.entrepiso))+" metros");
+      if(n(x.libre)!==null) alturas.push("altura libre de "+fmt(n(x.libre))+" metros");
+      var superficie = (hab && no)
+        ? "una superficie total de "+m2(total)+" m², de los cuales "+m2(hab)+
+          " m² corresponden a superficie habitable y "+m2(no)+" m² a superficie no habitable"
+        : (hab ? "una superficie de "+m2(hab)+" m², en su totalidad habitable"
+               : "una superficie de "+m2(total)+" m², en su totalidad no habitable");
+
+      if(varios){
+        parrafo("Los "+enLetra(grupo.length)+" niveles son de planta idéntica. "+
+                "Cada uno ocupa "+superficie+
+                (alturas.length?", con "+enumerar(alturas):"")+".");
+      } else {
+        var ini = n(x.npt)!==null
+          ? "Con nivel de piso terminado en "+npt(x.npt)+" metros"+
+            (alturas.length?", "+enumerar(alturas):"")+", "
+          : "";
+        parrafo(ini + (ini?elNivel(x.nombre):elNivel(x.nombre,true)) +
+                " ocupa "+superficie+".");
+      }
+
+      /* --- párrafo 2: qué aloja --- */
+      if(x.texto && String(x.texto).trim()) parrafo(String(x.texto).trim());
+      else {
+        var usos = partes(x.usos);
+        if(usos.length)
+          parrafo((varios?"Cada nivel aloja ":"En este nivel se alojan ")+
+                  enumerar(usos)+".");
+      }
+
+      /* Los desplantes de un grupo se listan al final, como en el original. */
+      if(varios){
+        var npts = grupo.map(function(y){ return n(y.npt)!==null ? npt(y.npt) : null; })
+                        .filter(Boolean);
+        if(npts.length===grupo.length)
+          parrafo("Los niveles se desplantan en "+enumerar(npts)+" metros respectivamente.");
+      }
+
+      /* La planta de cada nivel, emparejada por su nombre. */
+      graficos(nombres, true);
+    });
+  }
 
   /* --------------------------------------------------------- 2.x tablas -- */
   if(L.length){
-    titulo(2,"2.7 Alturas");
+    seccion2("Alturas");
     tabla([col(2760), col(1600,"right"), col(1600,"right"), col(1600,"right"),
            col(1800,"center")],
       ["Nivel","N.P.T. (m)","Entrepiso (m)","Altura libre (m)","Ubicación"],
       L.slice().reverse().map(function(x){
-        return [x.nombre||"—", x.npt?String(x.npt):"—", x.entrepiso?String(x.entrepiso):"—",
+        return [x.nombre||"—", n(x.npt)!==null?npt(x.npt):"—",
+                x.entrepiso?String(x.entrepiso):"—",
                 x.libre?String(x.libre):"—", x.snb?"S.N.B.":"B.N.B."];
       }));
-    graficos("2.5");
+    if(n(S.niveles.pretil)!==null)
+      parrafo("El pretil o remate del edificio se ubica en el nivel "+
+              npt(S.niveles.pretil)+" metros.");
+    graficos(["altura","corte"]);
   }
 
   if(c.patios.length){
-    titulo(2,"2.8 Patios de iluminación y ventilación");
+    seccion2("Patios de iluminación y ventilación");
     tabla([col(3360), col(1400,"center"), col(1800,"right"), col(1800,"right"),
            col(1800,"right")],
       ["Patio","Cantidad","Sentido transversal (m)","Sentido longitudinal (m)","Superficie (m²)"],
@@ -2268,11 +2423,11 @@ function bloquesDocumento(){
         return [p.nombre||"—", String(p.cant||1), fmt(p.corto), fmt(p.largo),
                 p.sup?fmt(p.sup):"—"];
       }));
-    graficos("2.6");
+    graficos(["patio"]);
   }
 
   if(S.estac.niveles.length){
-    titulo(2,"2.10 Estacionamiento");
+    seccion2("Estacionamiento");
     tabla([col(2760), col(1650,"right"), col(1650,"right"), col(1650,"right"), col(1650,"right")],
       ["Nivel","Cajones grandes","Cajones chicos","Total","Dimensión del grande"],
       S.estac.niveles.map(function(x){
@@ -2282,7 +2437,7 @@ function bloquesDocumento(){
   }
 
   if(S.elev.cantidad || S.elev.escaleras){
-    titulo(2,"2.11 Circulación vertical");
+    seccion2("Circulación vertical");
     var fe=[];
     if(S.elev.nucleos) fe.push(["Núcleos de circulación vertical", String(S.elev.nucleos)]);
     if(S.elev.cantidad) fe.push(["Elevadores", String(S.elev.cantidad)]);
@@ -2294,8 +2449,6 @@ function bloquesDocumento(){
 
   /* Los gráficos de secciones que este documento todavía no arma se ponen al
      final, para que ninguno se quede fuera sin que se note.                */
-  var puestos = {};
-  B.forEach(function(b){ if(b.t==="grafico") puestos[b.gid]=true; });
   var sueltos = S.graficos.filter(function(g){
     return g.estado!=="No aplica" && !puestos[g.gid];
   });
